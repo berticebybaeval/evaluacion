@@ -9,10 +9,33 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+    /* ── PALETA CARBÓN + AZUL ── */
+    :root {
+      --bg:        #16161a;
+      --surface:   #1f1f26;
+      --surface2:  #27272f;
+      --border:    #2e2e38;
+      --accent:    #2f6fd4;
+      --accent-bg: #1a2640;
+      --accent-lt: #7ab3ff;
+      --green:     #4aad5e;
+      --green-bg:  #122218;
+      --green-bd:  #1e4a2a;
+      --amber:     #d97706;
+      --amber-bg:  #1f1808;
+      --amber-bd:  #4a3510;
+      --red:       #e05555;
+      --red-bg:    #1f1010;
+      --red-bd:    #4a1c1c;
+      --txt:       #eaeaf0;
+      --txt2:      #9090a0;
+      --txt3:      #5a5a6a;
+    }
+
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background: #f5f4f0;
-      color: #1a1a18;
+      background: var(--bg);
+      color: var(--txt);
       min-height: 100vh;
       display: flex;
       align-items: flex-start;
@@ -21,9 +44,9 @@
     }
 
     .container {
-      background: #ffffff;
+      background: var(--surface);
       border-radius: 16px;
-      border: 0.5px solid #e0ddd6;
+      border: 0.5px solid var(--border);
       padding: 2rem;
       max-width: 680px;
       width: 100%;
@@ -35,13 +58,13 @@
       gap: 10px;
       margin-bottom: 1.75rem;
       padding-bottom: 1.25rem;
-      border-bottom: 0.5px solid #e0ddd6;
+      border-bottom: 0.5px solid var(--border);
     }
 
     .logo-icon {
       width: 36px;
       height: 36px;
-      background: #185FA5;
+      background: var(--accent);
       border-radius: 8px;
       display: flex;
       align-items: center;
@@ -50,8 +73,8 @@
       font-size: 18px;
     }
 
-    .logo-text { font-size: 15px; font-weight: 500; color: #1a1a18; }
-    .logo-sub { font-size: 12px; color: #9b9a95; }
+    .logo-text { font-size: 15px; font-weight: 500; color: var(--txt); }
+    .logo-sub { font-size: 12px; color: var(--txt3); }
 
     .stage-indicator {
       display: flex;
@@ -63,27 +86,27 @@
       height: 4px;
       flex: 1;
       border-radius: 2px;
-      background: #e0ddd6;
+      background: var(--surface2);
       transition: background 0.3s;
     }
 
-    .stage-dot.active { background: #185FA5; }
-    .stage-dot.done { background: #639922; }
+    .stage-dot.active { background: var(--accent); }
+    .stage-dot.done { background: var(--green); }
 
-    .prog-bar { height: 4px; background: #e0ddd6; border-radius: 2px; margin-bottom: 1.75rem; }
-    .prog-fill { height: 4px; background: #185FA5; border-radius: 2px; transition: width 0.3s ease; }
+    .prog-bar { height: 4px; background: var(--surface2); border-radius: 2px; margin-bottom: 1.75rem; }
+    .prog-fill { height: 4px; background: var(--accent); border-radius: 2px; transition: width 0.3s ease; }
 
     .section-tag {
       font-size: 11px;
       font-weight: 500;
-      color: #9b9a95;
+      color: var(--txt3);
       letter-spacing: 0.08em;
       text-transform: uppercase;
       margin-bottom: 0.4rem;
     }
 
-    h2 { font-size: 18px; font-weight: 500; color: #1a1a18; margin-bottom: 0.25rem; }
-    .subtitle { font-size: 13px; color: #6b6a65; margin-bottom: 1.5rem; line-height: 1.5; }
+    h2 { font-size: 18px; font-weight: 500; color: var(--txt); margin-bottom: 0.25rem; }
+    .subtitle { font-size: 13px; color: var(--txt2); margin-bottom: 1.5rem; line-height: 1.5; }
 
     /* Formulario */
     .form-grid {
@@ -99,10 +122,10 @@
     label {
       font-size: 12px;
       font-weight: 500;
-      color: #6b6a65;
+      color: var(--txt2);
     }
 
-    label .req { color: #A32D2D; margin-left: 2px; }
+    label .req { color: var(--red); margin-left: 2px; }
 
     input[type="text"],
     input[type="email"],
@@ -110,23 +133,24 @@
     select {
       height: 38px;
       padding: 0 12px;
-      border: 0.5px solid #e0ddd6;
+      border: 0.5px solid var(--border);
       border-radius: 8px;
       font-size: 14px;
       font-family: inherit;
-      color: #1a1a18;
-      background: #fff;
+      color: var(--txt);
+      background: var(--surface2);
       outline: none;
       transition: border-color 0.15s;
       width: 100%;
     }
 
-    input:focus, select:focus { border-color: #185FA5; }
-    input.error, select.error { border-color: #A32D2D; }
+    select option { background: var(--surface2); color: var(--txt); }
+    input:focus, select:focus { border-color: var(--accent); }
+    input.error, select.error { border-color: var(--red); }
 
     .field-error {
       font-size: 11px;
-      color: #A32D2D;
+      color: var(--red);
       display: none;
     }
 
@@ -140,8 +164,8 @@
       align-items: flex-start;
       gap: 11px;
       padding: 12px 14px;
-      background: #ffffff;
-      border: 0.5px solid #e0ddd6;
+      background: var(--surface2);
+      border: 0.5px solid var(--border);
       border-radius: 12px;
       cursor: pointer;
       text-align: left;
@@ -149,15 +173,15 @@
       width: 100%;
     }
 
-    .ob:hover { border-color: #b0afa9; background: #f5f4f0; }
-    .ob.sel { border-color: #185FA5; background: #e6f1fb; }
+    .ob:hover { border-color: #4a4a5a; background: #2e2e3a; }
+    .ob.sel { border-color: var(--accent); background: var(--accent-bg); }
 
     .oc {
       width: 18px;
       height: 18px;
       min-width: 18px;
       border-radius: 50%;
-      border: 0.5px solid #b0afa9;
+      border: 0.5px solid var(--txt3);
       margin-top: 2px;
       display: flex;
       align-items: center;
@@ -165,11 +189,11 @@
       transition: all 0.15s;
     }
 
-    .ob.sel .oc { background: #185FA5; border-color: #185FA5; }
+    .ob.sel .oc { background: var(--accent); border-color: var(--accent); }
     .od { width: 7px; height: 7px; border-radius: 50%; background: white; display: none; }
     .ob.sel .od { display: block; }
-    .ot { font-size: 13px; color: #1a1a18; line-height: 1.45; }
-    .ob.sel .ot { color: #185FA5; }
+    .ot { font-size: 13px; color: var(--txt2); line-height: 1.45; }
+    .ob.sel .ot { color: var(--accent-lt); }
 
     /* Navegación */
     .nav {
@@ -182,35 +206,35 @@
     .btn {
       padding: 9px 20px;
       border-radius: 8px;
-      border: 0.5px solid #b0afa9;
+      border: 0.5px solid var(--border);
       background: transparent;
-      color: #1a1a18;
+      color: var(--txt2);
       font-size: 13px;
       cursor: pointer;
       font-family: inherit;
       transition: background 0.15s;
     }
 
-    .btn:hover { background: #f5f4f0; }
+    .btn:hover { background: var(--surface2); }
 
     .btn-primary {
-      background: #185FA5;
+      background: var(--accent);
       color: white;
-      border-color: #185FA5;
+      border-color: var(--accent);
     }
 
-    .btn-primary:hover { opacity: 0.9; background: #185FA5; }
+    .btn-primary:hover { opacity: 0.9; background: var(--accent); }
     .btn-primary:disabled { opacity: 0.35; cursor: not-allowed; }
 
     .btn-success {
-      background: #3B6D11;
+      background: var(--green);
       color: white;
-      border-color: #3B6D11;
+      border-color: var(--green);
     }
 
-    .btn-success:hover { opacity: 0.9; background: #3B6D11; }
+    .btn-success:hover { opacity: 0.9; background: var(--green); }
 
-    .nc { font-size: 12px; color: #9b9a95; }
+    .nc { font-size: 12px; color: var(--txt3); }
 
     /* Resultado intermedio filtro */
     .result-box {
@@ -220,19 +244,19 @@
       text-align: center;
     }
 
-    .result-box.qualified { background: #eaf3de; border: 0.5px solid #97C459; }
-    .result-box.borderline { background: #faeeda; border: 0.5px solid #EF9F27; }
-    .result-box.disqualified { background: #fcebeb; border: 0.5px solid #F09595; }
+    .result-box.qualified    { background: var(--green-bg); border: 0.5px solid var(--green-bd); }
+    .result-box.borderline   { background: var(--amber-bg); border: 0.5px solid var(--amber-bd); }
+    .result-box.disqualified { background: var(--red-bg);   border: 0.5px solid var(--red-bd);   }
 
     .result-score {
       font-size: 52px;
       font-weight: 500;
-      color: #1a1a18;
+      color: var(--txt);
       line-height: 1;
       margin-bottom: 4px;
     }
 
-    .result-label { font-size: 13px; color: #6b6a65; margin-bottom: 1rem; }
+    .result-label { font-size: 13px; color: var(--txt2); margin-bottom: 1rem; }
 
     .badge {
       display: inline-block;
@@ -243,14 +267,14 @@
       margin-bottom: 1rem;
     }
 
-    .badge-success { background: #eaf3de; color: #3B6D11; border: 0.5px solid #97C459; }
-    .badge-warning { background: #faeeda; color: #854F0B; border: 0.5px solid #EF9F27; }
-    .badge-danger  { background: #fcebeb; color: #A32D2D; border: 0.5px solid #F09595; }
+    .badge-success { background: var(--green-bg); color: var(--green); border: 0.5px solid var(--green-bd); }
+    .badge-warning { background: var(--amber-bg); color: var(--amber); border: 0.5px solid var(--amber-bd); }
+    .badge-danger  { background: var(--red-bg);   color: var(--red);   border: 0.5px solid var(--red-bd);   }
 
     /* Barras de áreas */
     .rc {
-      background: #ffffff;
-      border: 0.5px solid #e0ddd6;
+      background: var(--surface2);
+      border: 0.5px solid var(--border);
       border-radius: 12px;
       padding: 1.25rem 1.5rem;
       margin-bottom: 0.75rem;
@@ -258,18 +282,18 @@
 
     .area-bar-wrap { margin-bottom: 0.6rem; }
     .area-bar-label { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; }
-    .area-bar-name { font-size: 13px; color: #1a1a18; font-weight: 500; }
-    .area-bar-pct  { font-size: 12px; color: #6b6a65; }
-    .area-bar      { height: 6px; background: #e0ddd6; border-radius: 3px; }
+    .area-bar-name { font-size: 13px; color: var(--txt); font-weight: 500; }
+    .area-bar-pct  { font-size: 12px; color: var(--txt2); }
+    .area-bar      { height: 6px; background: var(--border); border-radius: 3px; }
     .area-bar-fill { height: 6px; border-radius: 3px; transition: width 0.6s ease; }
 
     /* CTA WhatsApp */
     .cta-block { border-radius: 12px; padding: 1.25rem 1.5rem; margin-top: 0.75rem; }
-    .cta-s { background: #eaf3de; border: 0.5px solid #97C459; }
-    .cta-w { background: #faeeda; border: 0.5px solid #EF9F27; }
-    .cta-d { background: #fcebeb; border: 0.5px solid #F09595; }
-    .cta-h { font-size: 15px; font-weight: 500; margin-bottom: 6px; color: #1a1a18; }
-    .cta-b { font-size: 13px; color: #6b6a65; line-height: 1.5; margin-bottom: 1rem; }
+    .cta-s { background: var(--green-bg); border: 0.5px solid var(--green-bd); }
+    .cta-w { background: var(--amber-bg); border: 0.5px solid var(--amber-bd); }
+    .cta-d { background: var(--red-bg);   border: 0.5px solid var(--red-bd);   }
+    .cta-h { font-size: 15px; font-weight: 500; margin-bottom: 6px; color: var(--txt); }
+    .cta-b { font-size: 13px; color: var(--txt2); line-height: 1.5; margin-bottom: 1rem; }
 
     .btn-wa {
       display: inline-flex;
@@ -292,9 +316,9 @@
     .weak-list { list-style: none; padding: 0; margin: 0.75rem 0 0; }
     .weak-list li {
       font-size: 13px;
-      color: #6b6a65;
+      color: var(--txt2);
       padding: 4px 0;
-      border-bottom: 0.5px solid #e0ddd6;
+      border-bottom: 0.5px solid var(--border);
       display: flex;
       align-items: center;
       gap: 8px;
@@ -305,8 +329,9 @@
     .admin-wrap { max-width: 1100px; width: 100%; }
 
     .admin-header {
-      background: #1a1a18;
-      color: white;
+      background: var(--surface);
+      color: var(--txt);
+      border: 0.5px solid var(--border);
       border-radius: 12px;
       padding: 1.25rem 1.5rem;
       margin-bottom: 1rem;
@@ -316,7 +341,7 @@
     }
 
     .admin-header h1 { font-size: 16px; font-weight: 500; }
-    .admin-header p  { font-size: 12px; color: #9b9a95; margin-top: 2px; }
+    .admin-header p  { font-size: 12px; color: var(--txt3); margin-top: 2px; }
 
     .admin-stats {
       display: grid;
@@ -326,40 +351,40 @@
     }
 
     .stat-card {
-      background: #ffffff;
-      border: 0.5px solid #e0ddd6;
+      background: var(--surface);
+      border: 0.5px solid var(--border);
       border-radius: 10px;
       padding: 0.9rem 1rem;
     }
 
-    .stat-label { font-size: 11px; color: #9b9a95; margin-bottom: 4px; }
-    .stat-val   { font-size: 24px; font-weight: 500; color: #1a1a18; }
+    .stat-label { font-size: 11px; color: var(--txt3); margin-bottom: 4px; }
+    .stat-val   { font-size: 24px; font-weight: 500; color: var(--txt); }
 
     .admin-table-wrap {
-      background: #ffffff;
-      border: 0.5px solid #e0ddd6;
+      background: var(--surface);
+      border: 0.5px solid var(--border);
       border-radius: 12px;
       overflow: auto;
     }
 
     table { width: 100%; border-collapse: collapse; font-size: 12px; }
     th {
-      background: #f5f4f0;
-      color: #6b6a65;
+      background: var(--surface2);
+      color: var(--txt3);
       font-weight: 500;
       padding: 10px 12px;
       text-align: left;
-      border-bottom: 0.5px solid #e0ddd6;
+      border-bottom: 0.5px solid var(--border);
       white-space: nowrap;
     }
     td {
       padding: 9px 12px;
-      border-bottom: 0.5px solid #e0ddd6;
-      color: #1a1a18;
+      border-bottom: 0.5px solid var(--border);
+      color: var(--txt);
       white-space: nowrap;
     }
     tr:last-child td { border-bottom: none; }
-    tr:hover td { background: #f5f4f0; }
+    tr:hover td { background: var(--surface2); }
 
     .pill {
       display: inline-block;
@@ -369,15 +394,15 @@
       font-weight: 500;
     }
 
-    .pill-green  { background: #eaf3de; color: #3B6D11; }
-    .pill-yellow { background: #faeeda; color: #854F0B; }
-    .pill-red    { background: #fcebeb; color: #A32D2D; }
-    .pill-gray   { background: #f5f4f0; color: #6b6a65; }
+    .pill-green  { background: var(--green-bg); color: var(--green); }
+    .pill-yellow { background: var(--amber-bg); color: var(--amber); }
+    .pill-red    { background: var(--red-bg);   color: var(--red);   }
+    .pill-gray   { background: var(--surface2); color: var(--txt2);  }
 
     .empty-admin {
       padding: 3rem;
       text-align: center;
-      color: #9b9a95;
+      color: var(--txt3);
       font-size: 14px;
     }
 
@@ -460,7 +485,7 @@ function saveDB(db) { localStorage.setItem(DB_KEY, JSON.stringify(db)); }
 ═══════════════════════════════════════ */
 let contactData = {};
 let filterAns   = new Array(7).fill(null);
-let diagAns     = new Array(30).fill(null);
+let diagAns     = new Array(7).fill(null);
 let filterCur   = 0;
 let diagCur     = 0;
 let currentStage = 'contact'; // contact | filter | filter-result | diag | diag-result
@@ -529,185 +554,47 @@ const AREA_ICONS  = ['building','chart-bar','cash','truck','shield-check','devic
 const BAR_COLORS  = ['#185FA5','#0F6E56','#BA7517','#3B6D11','#993C1D','#534AB7'];
 
 const DIAG_QS = [
-  {a:0,q:'En el día a día, ¿cuántas decisiones de compra o autorizaciones dependen exclusivamente de ti o del dueño?',opts:[
-    {t:'Tenemos límites claros; el equipo toma decisiones operativas de forma autónoma',v:3},
-    {t:'Delego las menores, pero compras y autorizaciones importantes siempre pasan por mí',v:2},
-    {t:'Casi todo pasa por mí; sin mi disponibilidad es difícil avanzar',v:1},
-    {t:'Todo depende exclusivamente de mí; sin mi firma nada se mueve',v:0}
-  ]},
-  {a:0,q:'¿Tienen claramente definidas las responsabilidades del Administrador de Obra, el Jefe de Terreno y los capataces?',opts:[
-    {t:'Sí, tenemos organigrama y perfiles de cargo; cada uno sabe exactamente qué le corresponde',v:3},
-    {t:'Hay cierta claridad, pero a veces hay superposición o conflictos de responsabilidad',v:2},
-    {t:'Es informal; los roles se asignan según quién esté disponible',v:1},
-    {t:'No, los roles se mezclan constantemente y generan confusión en terreno',v:0}
-  ]},
-  {a:0,q:'Si te ausentas dos semanas, ¿la obra sigue su curso o se generan cuellos de botella?',opts:[
+  {a:0,q:'Si te ausentas dos semanas, ¿la obra sigue su curso normal o se paraliza?',opts:[
     {t:'La obra sigue sin problemas; el equipo está capacitado para tomar decisiones',v:3},
     {t:'Sigue, pero con dificultades y consultas frecuentes',v:2},
     {t:'Se generan retrasos importantes y el equipo pierde el norte',v:1},
     {t:'La obra prácticamente se detiene si no estoy presente',v:0}
   ]},
-  {a:0,q:'¿Pasa seguido que dos personas hacen el mismo trabajo o que tareas quedan sin hacer porque "el otro lo haría"?',opts:[
-    {t:'No, tenemos procesos claros que evitan duplicidades y vacíos de responsabilidad',v:3},
-    {t:'Ocurre ocasionalmente pero lo detectamos y corregimos rápido',v:2},
-    {t:'Es frecuente y nos genera pérdida de tiempo y retrabajos',v:1},
-    {t:'Es la norma; siempre hay confusión sobre quién hace qué',v:0}
+  {a:1,q:'¿Mides semanalmente el avance físico real de la obra versus lo que estaba planificado?',opts:[
+    {t:'Sí, con indicadores formales (% real vs. planificado) y reporte semanal documentado',v:3},
+    {t:'Hacemos seguimiento semanal pero sin indicadores claros ni registro formal',v:2},
+    {t:'El control es mensual o solo cuando el mandante lo exige',v:1},
+    {t:'No medimos; estimamos el avance visualmente en terreno',v:0}
   ]},
-  {a:0,q:'¿Cómo controlas la rotación del personal clave y qué haces para retener a los buenos maestros y profesionales?',opts:[
-    {t:'Tenemos política de retención, evaluaciones de desempeño y planes de desarrollo',v:3},
-    {t:'Hacemos algunos esfuerzos puntuales pero no es un proceso formal',v:2},
-    {t:'La rotación es alta y no tenemos estrategia clara para retener al personal clave',v:1},
-    {t:'No controlamos la rotación; perdemos buenos maestros constantemente',v:0}
-  ]},
-  {a:1,q:'¿Utilizan metodologías ágiles como Last Planner System o solo se guían por una Carta Gantt estática?',opts:[
-    {t:'Usamos Last Planner System u otra metodología ágil con reuniones semanales',v:3},
-    {t:'Tenemos Carta Gantt y la actualizamos regularmente según el avance real',v:2},
-    {t:'Tenemos Carta Gantt pero rara vez la seguimos o actualizamos',v:1},
-    {t:'No tenemos programación formal; avanzamos según lo que se presenta cada día',v:0}
-  ]},
-  {a:1,q:'¿Cómo mides semanalmente el avance físico real de la obra versus lo planificado?',opts:[
-    {t:'Medimos avance físico con indicadores (% real vs. planificado) y lo reportamos formalmente',v:3},
-    {t:'Hacemos seguimiento semanal pero de forma informal y sin indicadores claros',v:2},
-    {t:'El control es mensual o cuando el mandante lo solicita',v:1},
-    {t:'No medimos el avance sistemáticamente; lo estimamos visualmente',v:0}
-  ]},
-  {a:1,q:'Cuando la ITO o el mandante solicitan obras extraordinarias, ¿tienen proceso claro para cobrar antes de ejecutar?',opts:[
-    {t:'Sí, cotización y aprobación escrita firmada antes de ejecutar cualquier obra extraordinaria',v:3},
-    {t:'Generalmente lo hacemos, aunque a veces ejecutamos antes de confirmar el cobro',v:2},
-    {t:'Frecuentemente ejecutamos primero y después intentamos cobrar, con resultados variables',v:1},
-    {t:'No tenemos proceso; muchas obras extraordinarias quedan sin cobrar',v:0}
-  ]},
-  {a:1,q:'Al iniciar la instalación de faena, ¿diseñan el flujo de movimiento de maquinaria y cuadrillas?',opts:[
-    {t:'Sí, diseñamos el layout de faena y el flujo de trabajo antes de iniciar la obra gruesa',v:3},
-    {t:'Lo planificamos parcialmente, pero improvisamos bastante en terreno',v:2},
-    {t:'Rara vez lo planificamos; los conflictos de espacio se resuelven sobre la marcha',v:1},
-    {t:'No lo hacemos; la logística en terreno es reactiva y genera conflictos frecuentes',v:0}
-  ]},
-  {a:1,q:'¿Tienen medido el porcentaje de horas improductivas de las cuadrillas por falta de materiales o mala coordinación?',opts:[
-    {t:'Sí, medimos el % de horas improductivas y tomamos acciones correctivas con datos',v:3},
-    {t:'Tenemos una estimación aproximada pero sin medición formal',v:2},
-    {t:'Sabemos que hay tiempos muertos pero no los cuantificamos',v:1},
-    {t:'No lo medimos; desconocemos el impacto real en nuestra productividad',v:0}
-  ]},
-  {a:2,q:'¿Llevan control exacto de los días que demora el mandante en aprobar y pagar los estados de pago?',opts:[
-    {t:'Sí, registramos la antigüedad de cada estado de pago y gestionamos activamente el cobro',v:3},
-    {t:'Hacemos seguimiento pero de forma manual o poco sistemática',v:2},
-    {t:'Solo revisamos cuando hay problemas de liquidez',v:1},
-    {t:'No llevamos control; a veces no sabemos qué estados de pago están pendientes',v:0}
-  ]},
-  {a:2,q:'¿Diferencian la utilidad "en el papel" de la liquidez real disponible para pagar nóminas y leyes sociales?',opts:[
+  {a:2,q:'¿Diferencias la utilidad "en el papel" de la liquidez real disponible para pagar nóminas y leyes sociales?',opts:[
     {t:'Sí, tenemos flujo de caja proyectado y diferenciamos claramente utilidad devengada de liquidez',v:3},
-    {t:'Lo diferenciamos conceptualmente pero no lo gestionamos con herramientas formales',v:2},
+    {t:'Lo diferenciamos conceptualmente pero sin herramientas ni proceso formal',v:2},
     {t:'A veces confundimos facturación con disponibilidad; la falta de caja nos sorprende',v:1},
     {t:'No diferenciamos; hemos recurrido a créditos para pagar nóminas inesperadamente',v:0}
   ]},
-  {a:2,q:'¿Miden el rendimiento de costos (CPI) en tiempo real para saber si una partida específica está perdiendo plata?',opts:[
-    {t:'Sí, monitoreamos el CPI en tiempo real y tomamos acciones correctivas por partida',v:3},
-    {t:'Hacemos control de costos pero solo al cierre mensual o de partida',v:2},
-    {t:'Solo medimos costos al finalizar la obra; para entonces ya es tarde para corregir',v:1},
-    {t:'No medimos rendimiento de costos; las pérdidas las descubrimos cuando la obra termina',v:0}
+  {a:2,q:'¿Conoces el margen real de utilidad de cada obra al momento de cerrarla?',opts:[
+    {t:'Sí, cerramos cada obra con informe de costos vs. presupuesto y margen real documentado',v:3},
+    {t:'Lo calculamos aproximadamente al final pero sin proceso ni informe formal',v:2},
+    {t:'Solo sabemos si ganamos o perdimos de forma general, sin desglose por partida',v:1},
+    {t:'No lo calculamos; desconocemos la utilidad real por obra',v:0}
   ]},
-  {a:2,q:'¿Conocen con exactitud su tasa mensual de gastos generales (costo de mantener la empresa aunque la obra se paralice)?',opts:[
-    {t:'Sí, conocemos exactamente nuestra tasa mensual y la incluimos correctamente en los presupuestos',v:3},
-    {t:'Tenemos una estimación aproximada que ajustamos periódicamente',v:2},
-    {t:'No la calculamos formalmente; la estimamos al presupuestar cada obra',v:1},
-    {t:'No la conocemos; a veces nuestros presupuestos no cubren los gastos generales reales',v:0}
-  ]},
-  {a:2,q:'¿Tienen plan financiero para soportar retenciones de estados de pago y el costo de boletas de garantía?',opts:[
-    {t:'Sí, tenemos línea de crédito o flujo reservado para cubrir retenciones y garantías',v:3},
-    {t:'Lo gestionamos caso a caso pero sin plan financiero formal',v:2},
-    {t:'Las retenciones nos afectan el flujo pero no tenemos estrategia para mitigarlo',v:1},
-    {t:'Las retenciones y garantías nos han generado crisis de liquidez en más de una ocasión',v:0}
-  ]},
-  {a:3,q:'Al comprar materiales, ¿solo buscan la cotización más barata o evalúan también plazo de entrega y calidad?',opts:[
-    {t:'Evaluamos precio, plazo de entrega, calidad y servicio con criterios definidos por escrito',v:3},
-    {t:'Consideramos precio y plazo, pero el precio sigue siendo el factor dominante',v:2},
-    {t:'Generalmente elegimos al proveedor más barato sin evaluar otros factores',v:1},
-    {t:'Solo miramos precio; hemos tenido problemas por mala calidad o entregas tardías',v:0}
-  ]},
-  {a:3,q:'¿Qué tan frecuente es que la obra se paralice porque el material no llegó a tiempo a la bodega?',opts:[
+  {a:3,q:'¿Con qué frecuencia la obra se paraliza porque el material no llegó a tiempo a la bodega?',opts:[
     {t:'Muy poco frecuente; tenemos control de inventario y compras anticipadas planificadas',v:3},
-    {t:'Ocurre ocasionalmente pero lo resolvemos rápido',v:2},
+    {t:'Ocurre ocasionalmente pero lo resolvemos rápido sin mayor impacto',v:2},
     {t:'Es frecuente y nos genera retrasos y costos adicionales',v:1},
     {t:'Es un problema recurrente que paraliza la obra con regularidad',v:0}
   ]},
-  {a:3,q:'Para partidas críticas como hormigón o acero, ¿tienen proveedores backup si el principal les falla?',opts:[
-    {t:'Sí, tenemos al menos un proveedor alternativo homologado para cada material crítico',v:3},
-    {t:'Para algunos materiales críticos sí, pero no para todos',v:2},
-    {t:'No formalmente; buscamos alternativas cuando el problema ya ocurrió',v:1},
-    {t:'No, dependemos de un solo proveedor para la mayoría de los materiales críticos',v:0}
-  ]},
-  {a:3,q:'¿Llevan control estricto de que sus subcontratistas paguen imposiciones (F30 y F30-1) para evitar responsabilidad solidaria?',opts:[
-    {t:'Sí, exigimos F30 y F30-1 mensualmente y no cursamos estados de pago sin ellos',v:3},
-    {t:'Lo hacemos en general, pero a veces se nos escapa algún subcontratista',v:2},
-    {t:'Lo pedimos pero no siempre verificamos que estén al día',v:1},
-    {t:'No controlamos las imposiciones de subcontratistas; desconocemos nuestra exposición legal',v:0}
-  ]},
-  {a:3,q:'¿Realizan inventarios periódicos en bodega de obra para evitar mermas, robos o pérdidas de herramientas?',opts:[
-    {t:'Sí, inventarios periódicos con kardex actualizado y control de entradas/salidas',v:3},
-    {t:'Hacemos inventarios ocasionalmente pero sin sistema formal',v:2},
-    {t:'Solo hacemos inventario al inicio y fin de obra',v:1},
-    {t:'No llevamos control de bodega; las mermas y pérdidas son un costo asumido',v:0}
-  ]},
-  {a:4,q:'¿Tienen prevencionista activo que realice las charlas ODI y mantenga la tasa de accidentabilidad al mínimo?',opts:[
-    {t:'Sí, prevencionista dedicado, charlas ODI diarias y tasa de accidentabilidad bajo control',v:3},
-    {t:'Tenemos prevencionista a tiempo parcial o compartido y cumplimos lo básico',v:2},
-    {t:'Cumplimos los mínimos legales pero la seguridad no es prioridad real en terreno',v:1},
-    {t:'La seguridad es reactiva; actuamos solo ante accidentes o visitas de inspección',v:0}
-  ]},
-  {a:4,q:'¿Mantienen actualizados registros de inducciones firmadas, entregas de EPP y el Libro de Subcontratación?',opts:[
-    {t:'Sí, todo al día: inducciones firmadas, registros de EPP y Libro de Subcontratación actualizado',v:3},
-    {t:'Generalmente al día, pero con algunos documentos pendientes o atrasados',v:2},
-    {t:'Tenemos los documentos pero a menudo desactualizados o incompletos',v:1},
-    {t:'La documentación laboral es un punto débil; nos ha generado problemas con la ITO',v:0}
-  ]},
-  {a:4,q:'Durante las terminaciones, ¿utilizan protocolos o checklists para evitar que la ITO rechace las partidas?',opts:[
-    {t:'Sí, usamos protocolos y checklists formales por partida antes de llamar a la ITO',v:3},
-    {t:'Hacemos revisiones pero sin checklists formalizados',v:2},
-    {t:'La revisión depende del criterio del profesional a cargo; no hay estándar',v:1},
-    {t:'No, las observaciones de la ITO son nuestra forma de control de calidad; es reactivo',v:0}
-  ]},
-  {a:4,q:'¿Miden cuánto dinero pierden al mes por tener que demoler y volver a hacer un trabajo mal ejecutado?',opts:[
-    {t:'Sí, medimos el rework rate y mantenemos acciones correctivas documentadas',v:3},
-    {t:'Tenemos estimación general pero sin medición formal por partida',v:2},
+  {a:4,q:'¿Miden cuánto dinero pierden al mes en trabajos que hay que demoler y volver a hacer?',opts:[
+    {t:'Sí, medimos el rework rate con datos y mantenemos acciones correctivas documentadas',v:3},
+    {t:'Tenemos una estimación general pero sin medición formal por partida',v:2},
     {t:'Sabemos que hay reprocesos pero no cuantificamos el costo real',v:1},
     {t:'No lo medimos; los reprocesos se absorben como costo inevitable del negocio',v:0}
   ]},
-  {a:4,q:'¿Tienen equipo o procedimiento formal para atender garantías y postventa una vez entregado el proyecto?',opts:[
-    {t:'Sí, proceso formal de postventa con responsables y tiempos de respuesta definidos',v:3},
-    {t:'Atendemos la postventa pero de forma reactiva y sin proceso formalizado',v:2},
-    {t:'La postventa depende de la buena voluntad del equipo; no hay proceso claro',v:1},
-    {t:'No tenemos postventa formal; es una fuente recurrente de conflictos con clientes',v:0}
-  ]},
-  {a:5,q:'¿Controlan la obra con planillas Excel y WhatsApp o ya utilizan un software de gestión especializado?',opts:[
+  {a:5,q:'¿Controlan la gestión de obra con Excel y WhatsApp o ya tienen software especializado en construcción?',opts:[
     {t:'Usamos ERP o software especializado en construcción para proyectos, costos y compras',v:3},
     {t:'Usamos algunas herramientas digitales especializadas aunque no integradas entre sí',v:2},
-    {t:'Usamos Excel avanzado y WhatsApp; funciona pero con limitaciones importantes',v:1},
-    {t:'Solo Excel básico y comunicación informal; perdemos información con frecuencia',v:0}
-  ]},
-  {a:5,q:'¿Cómo controlan las horas reales trabajadas por maestros y subcontratos para el pago de nómina?',opts:[
-    {t:'Sistema digital (app o biométrico) que registra horas reales e integra con nómina',v:3},
-    {t:'Tenemos control manual o semi-digital que revisamos para el pago',v:2},
-    {t:'Usamos planillas en papel que alguien transcribe manualmente',v:1},
-    {t:'El control es informal; basado en la palabra del capataz o del subcontratista',v:0}
-  ]},
-  {a:5,q:'¿Tienen planos, RDI y especificaciones técnicas centralizados en la nube con control de versiones para terreno?',opts:[
-    {t:'Sí, plataforma en la nube con control de versiones y acceso desde terreno en tiempo real',v:3},
-    {t:'Usamos nube (Drive, Dropbox) pero sin control formal de versiones',v:2},
-    {t:'Los documentos están en computadores locales; actualizarlos en terreno es un problema',v:1},
-    {t:'No, trabajamos con planos impresos; es frecuente construir con versiones desactualizadas',v:0}
-  ]},
-  {a:5,q:'¿Los profesionales de obra usan tablets o celulares para levantar no conformidades e incidencias en terreno?',opts:[
-    {t:'Sí, el equipo usa apps para reportes diarios, NCR y registro fotográfico de avance',v:3},
-    {t:'Usamos algunos medios digitales pero con resistencia del equipo o uso inconsistente',v:2},
-    {t:'Los reportes se hacen en papel o WhatsApp y alguien los transcribe después',v:1},
-    {t:'No hay reporte diario formal de terreno',v:0}
-  ]},
-  {a:5,q:'¿Han evaluado o implementado BIM para adelantarse a interferencias entre especialidades antes de construir?',opts:[
-    {t:'Sí, usamos BIM activamente para coordinación de especialidades y gestión de interferencias',v:3},
-    {t:'Hemos evaluado BIM o lo usamos parcialmente en algunos proyectos',v:2},
-    {t:'Conocemos BIM pero no lo hemos implementado; está en los planes',v:1},
-    {t:'No lo consideramos relevante para nuestro tipo de proyectos',v:0}
+    {t:'Excel avanzado y WhatsApp; funciona pero con limitaciones importantes',v:1},
+    {t:'Solo Excel básico e información informal; perdemos datos con frecuencia',v:0}
   ]}
 ];
 
@@ -945,7 +832,7 @@ function showFilterResult() {
    ETAPA 3 — DIAGNÓSTICO 30 PREGUNTAS
 ═══════════════════════════════════════ */
 function startDiag() {
-  diagAns  = new Array(30).fill(null);
+  diagAns  = new Array(7).fill(null);
   diagCur  = 0;
   currentStage = 'diag';
   updateStages(3);
@@ -1101,6 +988,9 @@ function showDiagResult() {
 /* ═══════════════════════════════════════
    BASE DE DATOS — localStorage
 ═══════════════════════════════════════ */
+/* ── URL de Google Sheets (Apps Script) ── */
+const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbyUhIuDbjh2etMw--2M69raAzwBVfJuM_3faJPc9W8GL9c9HI7-jmUukL2emN7aDrOsjw/exec';
+
 function saveProspect(filterPct, filterTier, diagPct, diagTier, aScores) {
   const db = loadDB();
   const now = new Date();
@@ -1128,14 +1018,25 @@ function saveProspect(filterPct, filterTier, diagPct, diagTier, aScores) {
     area_tecnologia:    aScores ? pct(aScores[5].score, aScores[5].max) : '—',
   };
 
+  /* Guardar en localStorage (respaldo local) */
   db.push(record);
   saveDB(db);
+
+  /* Enviar a Google Sheets */
+  fetch(SHEETS_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(record)
+  }).catch(() => {
+    /* Si falla la red, el dato ya quedó en localStorage como respaldo */
+  });
 }
 
 function restart() {
   contactData = {};
   filterAns   = new Array(7).fill(null);
-  diagAns     = new Array(30).fill(null);
+  diagAns     = new Array(7).fill(null);
   filterCur   = 0;
   diagCur     = 0;
   currentStage = 'contact';
@@ -1150,6 +1051,9 @@ function restart() {
 ═══════════════════════════════════════ */
 function renderAdmin() {
   document.body.style.alignItems = 'flex-start';
+  document.getElementById('app').style.display   = 'none';
+  document.getElementById('admin').style.display = 'block';
+
   const db = loadDB();
 
   const total       = db.length;
@@ -1159,23 +1063,11 @@ function renderAdmin() {
     ? Math.round(db.filter(r => r.diag_pct !== '—').reduce((s, r) => s + r.diag_pct, 0) / conDiag)
     : '—';
 
-  document.getElementById('admin-stats').innerHTML = `
-    <div class="stat-card"><div class="stat-label">Total prospectos</div><div class="stat-val">${total}</div></div>
-    <div class="stat-card"><div class="stat-label">Perfil calificado (≥60%)</div><div class="stat-val">${calificados}</div></div>
-    <div class="stat-card"><div class="stat-label">Completaron diagnóstico</div><div class="stat-val">${conDiag}</div></div>
-    <div class="stat-card"><div class="stat-label">Promedio diagnóstico</div><div class="stat-val">${avgDiag}${avgDiag !== '—' ? '%' : ''}</div></div>
-  `;
-
-  if (db.length === 0) {
-    document.getElementById('admin-table').innerHTML = '<div class="empty-admin"><i class="ti ti-inbox" style="font-size:32px;display:block;margin-bottom:.5rem"></i>Aún no hay prospectos registrados.</div>';
-    return;
-  }
-
-  function pill(pct) {
-    if (pct === '—') return '<span class="pill pill-gray">—</span>';
-    if (pct >= 65)   return `<span class="pill pill-green">${pct}%</span>`;
-    if (pct >= 40)   return `<span class="pill pill-yellow">${pct}%</span>`;
-    return `<span class="pill pill-red">${pct}%</span>`;
+  function pill(p) {
+    if (p === '—') return '<span class="pill pill-gray">—</span>';
+    if (p >= 65)   return `<span class="pill pill-green">${p}%</span>`;
+    if (p >= 40)   return `<span class="pill pill-yellow">${p}%</span>`;
+    return `<span class="pill pill-red">${p}%</span>`;
   }
 
   function filterPill(p) {
@@ -1184,56 +1076,70 @@ function renderAdmin() {
     return `<span class="pill pill-red">${p}%</span>`;
   }
 
-  const rows = [...db].reverse().map(r => `
-    <tr>
-      <td>${r.fecha}</td>
-      <td><strong>${r.nombre}</strong></td>
-      <td>${r.empresa || '—'}</td>
-      <td>${r.cargo || '—'}</td>
-      <td>${r.email}</td>
-      <td>${r.telefono}</td>
-      <td>${r.region || '—'}</td>
-      <td>${r.especialidad || '—'}</td>
-      <td>${r.rut || '—'}</td>
-      <td>${filterPill(r.filtro_pct)}</td>
-      <td>${pill(r.diag_pct)}</td>
-      <td>${r.diag_tier !== '—' ? `<span style="font-size:11px;color:#6b6a65">${r.diag_tier}</span>` : '—'}</td>
-      <td>${pill(r.area_liderazgo)}</td>
-      <td>${pill(r.area_planificacion)}</td>
-      <td>${pill(r.area_finanzas)}</td>
-      <td>${pill(r.area_abastecimiento)}</td>
-      <td>${pill(r.area_calidad)}</td>
-      <td>${pill(r.area_tecnologia)}</td>
-    </tr>
-  `).join('');
+  const tableContent = db.length === 0
+    ? '<div class="empty-admin"><i class="ti ti-inbox" style="font-size:32px;display:block;margin-bottom:.5rem"></i>Aún no hay prospectos registrados.</div>'
+    : `<table>
+        <thead><tr>
+          <th>Fecha</th><th>Nombre</th><th>Empresa</th><th>Cargo</th>
+          <th>Email</th><th>Teléfono</th><th>Región</th><th>Especialidad</th><th>RUT</th>
+          <th>Filtro</th><th>Diagnóstico</th><th>Clasificación</th>
+          <th>Liderazgo</th><th>Planificación</th><th>Finanzas</th>
+          <th>Abastecimiento</th><th>Calidad</th><th>Tecnología</th>
+        </tr></thead>
+        <tbody>
+          ${[...db].reverse().map(r => `<tr>
+            <td>${r.fecha}</td>
+            <td><strong>${r.nombre}</strong></td>
+            <td>${r.empresa || '—'}</td>
+            <td>${r.cargo || '—'}</td>
+            <td>${r.email}</td>
+            <td>${r.telefono}</td>
+            <td>${r.region || '—'}</td>
+            <td>${r.especialidad || '—'}</td>
+            <td>${r.rut || '—'}</td>
+            <td>${filterPill(r.filtro_pct)}</td>
+            <td>${pill(r.diag_pct)}</td>
+            <td>${r.diag_tier !== '—' ? `<span style="font-size:11px;color:#6b6a65">${r.diag_tier}</span>` : '—'}</td>
+            <td>${pill(r.area_liderazgo)}</td>
+            <td>${pill(r.area_planificacion)}</td>
+            <td>${pill(r.area_finanzas)}</td>
+            <td>${pill(r.area_abastecimiento)}</td>
+            <td>${pill(r.area_calidad)}</td>
+            <td>${pill(r.area_tecnologia)}</td>
+          </tr>`).join('')}
+        </tbody>
+      </table>`;
 
-  document.getElementById('admin-table').innerHTML = `
-    <table>
-      <thead>
-        <tr>
-          <th>Fecha</th>
-          <th>Nombre</th>
-          <th>Empresa</th>
-          <th>Cargo</th>
-          <th>Email</th>
-          <th>Teléfono</th>
-          <th>Región</th>
-          <th>Especialidad</th>
-          <th>RUT</th>
-          <th>Filtro</th>
-          <th>Diagnóstico</th>
-          <th>Clasificación</th>
-          <th>Liderazgo</th>
-          <th>Planificación</th>
-          <th>Finanzas</th>
-          <th>Abastecimiento</th>
-          <th>Calidad</th>
-          <th>Tecnología</th>
-        </tr>
-      </thead>
-      <tbody>${rows}</tbody>
-    </table>
+  document.getElementById('admin').innerHTML = `
+    <div class="admin-wrap" style="padding:1rem">
+      <div class="admin-header">
+        <div>
+          <h1><i class="ti ti-database" style="margin-right:6px"></i>Panel de prospectos</h1>
+          <p>Todos los registros capturados en el formulario</p>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <button class="btn btn-success" onclick="exportExcel()" style="display:flex;align-items:center;gap:6px">
+            <i class="ti ti-file-spreadsheet"></i> Exportar a Excel
+          </button>
+          <button class="btn" onclick="adminLogout()" style="display:flex;align-items:center;gap:6px;color:#6b6a65">
+            <i class="ti ti-logout"></i> Salir
+          </button>
+        </div>
+      </div>
+      <div class="admin-stats">
+        <div class="stat-card"><div class="stat-label">Total prospectos</div><div class="stat-val">${total}</div></div>
+        <div class="stat-card"><div class="stat-label">Perfil calificado (≥60%)</div><div class="stat-val">${calificados}</div></div>
+        <div class="stat-card"><div class="stat-label">Completaron diagnóstico</div><div class="stat-val">${conDiag}</div></div>
+        <div class="stat-card"><div class="stat-label">Promedio diagnóstico</div><div class="stat-val">${avgDiag}${avgDiag !== '—' ? '%' : ''}</div></div>
+      </div>
+      <div class="admin-table-wrap">${tableContent}</div>
+    </div>
   `;
+}
+
+function adminLogout() {
+  sessionStorage.removeItem('admin_auth');
+  location.reload();
 }
 
 /* ═══════════════════════════════════════
@@ -1268,12 +1174,73 @@ function exportExcel() {
 }
 
 /* ═══════════════════════════════════════
+   ADMIN — CONTRASEÑA
+   Para cambiar la contraseña:
+   1. Abre la consola del navegador (F12)
+   2. Ejecuta: hashPwd('tu_nueva_clave').then(h => console.log(h))
+   3. Copia el hash resultante y reemplaza ADMIN_HASH abajo
+═══════════════════════════════════════ */
+const ADMIN_HASH = '8afee30d8e9ede277373166b29c8bf9878ec30ef8008db291aa92ef15ea4308e'; // contraseña por defecto: constructor2024
+
+async function hashPwd(pwd) {
+  const buf  = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(pwd));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+function renderAdminLogin(errorMsg) {
+  document.getElementById('app').style.display   = 'none';
+  document.getElementById('admin').style.display = 'block';
+  document.getElementById('admin').innerHTML = `
+    <div style="max-width:360px;margin:4rem auto">
+      <div style="background:#fff;border:.5px solid #e0ddd6;border-radius:16px;padding:2rem">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:1.5rem">
+          <div style="width:36px;height:36px;background:#1a1a18;border-radius:8px;display:flex;align-items:center;justify-content:center;color:white;font-size:18px">
+            <i class="ti ti-lock"></i>
+          </div>
+          <div>
+            <div style="font-size:15px;font-weight:500;color:#1a1a18">Panel de administración</div>
+            <div style="font-size:12px;color:#9b9a95">Acceso restringido</div>
+          </div>
+        </div>
+        <div style="margin-bottom:1rem">
+          <label style="font-size:12px;font-weight:500;color:#6b6a65;display:block;margin-bottom:5px">Contraseña</label>
+          <input type="password" id="admin-pwd" placeholder="Ingresa tu contraseña"
+            style="width:100%;height:38px;padding:0 12px;border:.5px solid ${errorMsg ? '#A32D2D' : '#e0ddd6'};border-radius:8px;font-size:14px;font-family:inherit;outline:none"
+            onkeydown="if(event.key==='Enter')checkAdminPwd()" autofocus />
+          ${errorMsg ? `<div style="font-size:11px;color:#A32D2D;margin-top:4px">${errorMsg}</div>` : ''}
+        </div>
+        <button onclick="checkAdminPwd()"
+          style="width:100%;padding:9px;background:#1a1a18;color:white;border:none;border-radius:8px;font-size:14px;font-family:inherit;cursor:pointer">
+          Ingresar
+        </button>
+      </div>
+    </div>
+  `;
+}
+
+async function checkAdminPwd() {
+  const pwd  = document.getElementById('admin-pwd').value;
+  const hash = await hashPwd(pwd);
+  if (hash === ADMIN_HASH) {
+    sessionStorage.setItem('admin_auth', '1');
+    document.getElementById('admin').innerHTML = '';
+    renderAdmin();
+  } else {
+    renderAdminLogin('Contraseña incorrecta. Intenta nuevamente.');
+  }
+}
+
+/* ═══════════════════════════════════════
    ROUTING — al final, después de todas las definiciones
 ═══════════════════════════════════════ */
 if (new URLSearchParams(location.search).get('admin') === '1') {
-  document.getElementById('app').style.display   = 'none';
-  document.getElementById('admin').style.display = 'block';
-  renderAdmin();
+  if (sessionStorage.getItem('admin_auth') === '1') {
+    document.getElementById('app').style.display   = 'none';
+    document.getElementById('admin').style.display = 'block';
+    renderAdmin();
+  } else {
+    renderAdminLogin();
+  }
 } else {
   initApp();
 }
