@@ -1,0 +1,1282 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Diagnóstico de Gestión — Pymes Constructoras</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #f5f4f0;
+      color: #1a1a18;
+      min-height: 100vh;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 2rem 1rem;
+    }
+
+    .container {
+      background: #ffffff;
+      border-radius: 16px;
+      border: 0.5px solid #e0ddd6;
+      padding: 2rem;
+      max-width: 680px;
+      width: 100%;
+    }
+
+    .logo-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 1.75rem;
+      padding-bottom: 1.25rem;
+      border-bottom: 0.5px solid #e0ddd6;
+    }
+
+    .logo-icon {
+      width: 36px;
+      height: 36px;
+      background: #185FA5;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 18px;
+    }
+
+    .logo-text { font-size: 15px; font-weight: 500; color: #1a1a18; }
+    .logo-sub { font-size: 12px; color: #9b9a95; }
+
+    .stage-indicator {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 1.75rem;
+    }
+
+    .stage-dot {
+      height: 4px;
+      flex: 1;
+      border-radius: 2px;
+      background: #e0ddd6;
+      transition: background 0.3s;
+    }
+
+    .stage-dot.active { background: #185FA5; }
+    .stage-dot.done { background: #639922; }
+
+    .prog-bar { height: 4px; background: #e0ddd6; border-radius: 2px; margin-bottom: 1.75rem; }
+    .prog-fill { height: 4px; background: #185FA5; border-radius: 2px; transition: width 0.3s ease; }
+
+    .section-tag {
+      font-size: 11px;
+      font-weight: 500;
+      color: #9b9a95;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 0.4rem;
+    }
+
+    h2 { font-size: 18px; font-weight: 500; color: #1a1a18; margin-bottom: 0.25rem; }
+    .subtitle { font-size: 13px; color: #6b6a65; margin-bottom: 1.5rem; line-height: 1.5; }
+
+    /* Formulario */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 1.25rem;
+    }
+
+    .form-group { display: flex; flex-direction: column; gap: 5px; }
+    .form-group.full { grid-column: 1 / -1; }
+
+    label {
+      font-size: 12px;
+      font-weight: 500;
+      color: #6b6a65;
+    }
+
+    label .req { color: #A32D2D; margin-left: 2px; }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="tel"],
+    select {
+      height: 38px;
+      padding: 0 12px;
+      border: 0.5px solid #e0ddd6;
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: inherit;
+      color: #1a1a18;
+      background: #fff;
+      outline: none;
+      transition: border-color 0.15s;
+      width: 100%;
+    }
+
+    input:focus, select:focus { border-color: #185FA5; }
+    input.error, select.error { border-color: #A32D2D; }
+
+    .field-error {
+      font-size: 11px;
+      color: #A32D2D;
+      display: none;
+    }
+
+    .field-error.show { display: block; }
+
+    /* Opciones quiz */
+    .opts { display: grid; gap: 8px; }
+
+    .ob {
+      display: flex;
+      align-items: flex-start;
+      gap: 11px;
+      padding: 12px 14px;
+      background: #ffffff;
+      border: 0.5px solid #e0ddd6;
+      border-radius: 12px;
+      cursor: pointer;
+      text-align: left;
+      transition: border-color 0.15s, background 0.15s;
+      width: 100%;
+    }
+
+    .ob:hover { border-color: #b0afa9; background: #f5f4f0; }
+    .ob.sel { border-color: #185FA5; background: #e6f1fb; }
+
+    .oc {
+      width: 18px;
+      height: 18px;
+      min-width: 18px;
+      border-radius: 50%;
+      border: 0.5px solid #b0afa9;
+      margin-top: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s;
+    }
+
+    .ob.sel .oc { background: #185FA5; border-color: #185FA5; }
+    .od { width: 7px; height: 7px; border-radius: 50%; background: white; display: none; }
+    .ob.sel .od { display: block; }
+    .ot { font-size: 13px; color: #1a1a18; line-height: 1.45; }
+    .ob.sel .ot { color: #185FA5; }
+
+    /* Navegación */
+    .nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 1.5rem;
+    }
+
+    .btn {
+      padding: 9px 20px;
+      border-radius: 8px;
+      border: 0.5px solid #b0afa9;
+      background: transparent;
+      color: #1a1a18;
+      font-size: 13px;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background 0.15s;
+    }
+
+    .btn:hover { background: #f5f4f0; }
+
+    .btn-primary {
+      background: #185FA5;
+      color: white;
+      border-color: #185FA5;
+    }
+
+    .btn-primary:hover { opacity: 0.9; background: #185FA5; }
+    .btn-primary:disabled { opacity: 0.35; cursor: not-allowed; }
+
+    .btn-success {
+      background: #3B6D11;
+      color: white;
+      border-color: #3B6D11;
+    }
+
+    .btn-success:hover { opacity: 0.9; background: #3B6D11; }
+
+    .nc { font-size: 12px; color: #9b9a95; }
+
+    /* Resultado intermedio filtro */
+    .result-box {
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+
+    .result-box.qualified { background: #eaf3de; border: 0.5px solid #97C459; }
+    .result-box.borderline { background: #faeeda; border: 0.5px solid #EF9F27; }
+    .result-box.disqualified { background: #fcebeb; border: 0.5px solid #F09595; }
+
+    .result-score {
+      font-size: 52px;
+      font-weight: 500;
+      color: #1a1a18;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .result-label { font-size: 13px; color: #6b6a65; margin-bottom: 1rem; }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 500;
+      margin-bottom: 1rem;
+    }
+
+    .badge-success { background: #eaf3de; color: #3B6D11; border: 0.5px solid #97C459; }
+    .badge-warning { background: #faeeda; color: #854F0B; border: 0.5px solid #EF9F27; }
+    .badge-danger  { background: #fcebeb; color: #A32D2D; border: 0.5px solid #F09595; }
+
+    /* Barras de áreas */
+    .rc {
+      background: #ffffff;
+      border: 0.5px solid #e0ddd6;
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .area-bar-wrap { margin-bottom: 0.6rem; }
+    .area-bar-label { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; }
+    .area-bar-name { font-size: 13px; color: #1a1a18; font-weight: 500; }
+    .area-bar-pct  { font-size: 12px; color: #6b6a65; }
+    .area-bar      { height: 6px; background: #e0ddd6; border-radius: 3px; }
+    .area-bar-fill { height: 6px; border-radius: 3px; transition: width 0.6s ease; }
+
+    /* CTA WhatsApp */
+    .cta-block { border-radius: 12px; padding: 1.25rem 1.5rem; margin-top: 0.75rem; }
+    .cta-s { background: #eaf3de; border: 0.5px solid #97C459; }
+    .cta-w { background: #faeeda; border: 0.5px solid #EF9F27; }
+    .cta-d { background: #fcebeb; border: 0.5px solid #F09595; }
+    .cta-h { font-size: 15px; font-weight: 500; margin-bottom: 6px; color: #1a1a18; }
+    .cta-b { font-size: 13px; color: #6b6a65; line-height: 1.5; margin-bottom: 1rem; }
+
+    .btn-wa {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      background: #25D366;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: none;
+      font-family: inherit;
+    }
+
+    .btn-wa:hover { opacity: 0.88; }
+
+    .weak-list { list-style: none; padding: 0; margin: 0.75rem 0 0; }
+    .weak-list li {
+      font-size: 13px;
+      color: #6b6a65;
+      padding: 4px 0;
+      border-bottom: 0.5px solid #e0ddd6;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .weak-list li:last-child { border: none; }
+
+    /* ── ADMIN PANEL ── */
+    .admin-wrap { max-width: 1100px; width: 100%; }
+
+    .admin-header {
+      background: #1a1a18;
+      color: white;
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .admin-header h1 { font-size: 16px; font-weight: 500; }
+    .admin-header p  { font-size: 12px; color: #9b9a95; margin-top: 2px; }
+
+    .admin-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 10px;
+      margin-bottom: 1rem;
+    }
+
+    .stat-card {
+      background: #ffffff;
+      border: 0.5px solid #e0ddd6;
+      border-radius: 10px;
+      padding: 0.9rem 1rem;
+    }
+
+    .stat-label { font-size: 11px; color: #9b9a95; margin-bottom: 4px; }
+    .stat-val   { font-size: 24px; font-weight: 500; color: #1a1a18; }
+
+    .admin-table-wrap {
+      background: #ffffff;
+      border: 0.5px solid #e0ddd6;
+      border-radius: 12px;
+      overflow: auto;
+    }
+
+    table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    th {
+      background: #f5f4f0;
+      color: #6b6a65;
+      font-weight: 500;
+      padding: 10px 12px;
+      text-align: left;
+      border-bottom: 0.5px solid #e0ddd6;
+      white-space: nowrap;
+    }
+    td {
+      padding: 9px 12px;
+      border-bottom: 0.5px solid #e0ddd6;
+      color: #1a1a18;
+      white-space: nowrap;
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #f5f4f0; }
+
+    .pill {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 500;
+    }
+
+    .pill-green  { background: #eaf3de; color: #3B6D11; }
+    .pill-yellow { background: #faeeda; color: #854F0B; }
+    .pill-red    { background: #fcebeb; color: #A32D2D; }
+    .pill-gray   { background: #f5f4f0; color: #6b6a65; }
+
+    .empty-admin {
+      padding: 3rem;
+      text-align: center;
+      color: #9b9a95;
+      font-size: 14px;
+    }
+
+    @media (max-width: 520px) {
+      body { padding: 1rem 0.5rem; }
+      .container { padding: 1.25rem; border-radius: 12px; }
+      .form-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════
+     FLUJO PROSPECTO
+══════════════════════════════════════════ -->
+<div class="container" id="app">
+
+  <div class="logo-row">
+    <div class="logo-icon"><i class="ti ti-building"></i></div>
+    <div>
+      <div class="logo-text">Diagnóstico Constructoras</div>
+      <div class="logo-sub">Evaluación de gestión empresarial</div>
+    </div>
+  </div>
+
+  <div class="stage-indicator">
+    <div class="stage-dot" id="sd1"></div>
+    <div class="stage-dot" id="sd2"></div>
+    <div class="stage-dot" id="sd3"></div>
+    <div class="stage-dot" id="sd4"></div>
+  </div>
+
+  <div class="prog-bar" id="prog-bar" style="display:none">
+    <div class="prog-fill" id="pf" style="width:0%"></div>
+  </div>
+
+  <div id="view"></div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     PANEL ADMIN
+══════════════════════════════════════════ -->
+<div class="admin-wrap" id="admin" style="display:none">
+
+  <div class="admin-header">
+    <div>
+      <h1><i class="ti ti-database" style="margin-right:6px"></i>Panel de prospectos</h1>
+      <p>Todos los registros capturados en el formulario</p>
+    </div>
+    <button class="btn btn-success" onclick="exportExcel()" style="display:flex;align-items:center;gap:6px">
+      <i class="ti ti-file-spreadsheet"></i> Exportar a Excel
+    </button>
+  </div>
+
+  <div class="admin-stats" id="admin-stats"></div>
+
+  <div class="admin-table-wrap">
+    <div id="admin-table"></div>
+  </div>
+
+</div>
+
+<script>
+/* ═══════════════════════════════════════
+   DATOS
+═══════════════════════════════════════ */
+const WA_NUMBER = '56962499101';
+const DB_KEY    = 'prospectos_constructoras';
+
+function loadDB()   { try { return JSON.parse(localStorage.getItem(DB_KEY) || '[]'); } catch(e){ return []; } }
+function saveDB(db) { localStorage.setItem(DB_KEY, JSON.stringify(db)); }
+
+/* ═══════════════════════════════════════
+   ROUTING
+═══════════════════════════════════════ */
+/* routing se ejecuta al final del script, después de todas las definiciones */
+
+/* ═══════════════════════════════════════
+   ESTADO GLOBAL
+═══════════════════════════════════════ */
+let contactData = {};
+let filterAns   = new Array(7).fill(null);
+let diagAns     = new Array(30).fill(null);
+let filterCur   = 0;
+let diagCur     = 0;
+let currentStage = 'contact'; // contact | filter | filter-result | diag | diag-result
+
+/* ═══════════════════════════════════════
+   FILTRO RÁPIDO — 7 PREGUNTAS
+═══════════════════════════════════════ */
+const FILTER_QS = [
+  { q: '¿Qué describe mejor tu empresa constructora?', opts: [
+    { t: 'Empresa con más de 5 años, proyectos activos y equipo formado', v: 3 },
+    { t: 'Empresa de 2 a 5 años en proceso de consolidación', v: 2 },
+    { t: 'Empresa menor de 2 años o en etapa de arranque', v: 1 },
+    { t: 'Proyecto personal o empresa unipersonal sin equipo', v: 0 }
+  ]},
+  { q: '¿Cuentas con presupuesto para invertir en consultoría de gestión?', opts: [
+    { t: 'Sí, tenemos presupuesto definido y aprobado', v: 3 },
+    { t: 'Tenemos recursos, pero no están formalizados aún', v: 2 },
+    { t: 'Presupuesto muy limitado; requeriría opciones flexibles', v: 1 },
+    { t: 'No cuento con presupuesto disponible ahora', v: 0 }
+  ]},
+  { q: '¿Cuál es tu horizonte para tomar acción?', opts: [
+    { t: 'Inmediato — quiero empezar este mes', v: 3 },
+    { t: 'En los próximos 1 a 3 meses', v: 2 },
+    { t: 'Más de 3 meses; aún evaluando opciones', v: 1 },
+    { t: 'Solo estoy explorando, sin fecha definida', v: 0 }
+  ]},
+  { q: '¿Cuál es el principal dolor que quieres resolver hoy?', opts: [
+    { t: 'Problemas urgentes de rentabilidad o flujo de caja en obra', v: 3 },
+    { t: 'Ineficiencias operativas claras que nos generan pérdidas', v: 3 },
+    { t: 'Queremos crecer pero no sabemos cómo escalar bien', v: 2 },
+    { t: 'Exploración general de mejoras sin urgencia específica', v: 1 }
+  ]},
+  { q: '¿Quién toma las decisiones en tu empresa?', opts: [
+    { t: 'Yo soy el decisor principal (dueño, socio o gerente general)', v: 3 },
+    { t: 'Participo en la decisión junto a otro socio o directivo', v: 2 },
+    { t: 'Soy ejecutor presentando opciones a quien decide', v: 1 },
+    { t: 'No tengo claridad sobre el proceso de decisión', v: 0 }
+  ]},
+  { q: '¿Has trabajado antes con consultores o asesores externos?', opts: [
+    { t: 'Sí, con buenos resultados; entendemos el valor que aporta', v: 3 },
+    { t: 'Sí, aunque no siempre fue lo esperado', v: 2 },
+    { t: 'No, pero estoy abierto a intentarlo por primera vez', v: 1 },
+    { t: 'No, y tengo dudas sobre el valor real que puede aportar', v: 0 }
+  ]},
+  { q: '¿Qué tan involucrado estarías tú en el proceso de consultoría?', opts: [
+    { t: 'Alto compromiso — dispuesto a dedicar tiempo, acceso e información', v: 3 },
+    { t: 'Compromiso moderado — puedo participar con tiempo limitado', v: 2 },
+    { t: 'Prefiero delegar y que el consultor trabaje de forma autónoma', v: 1 },
+    { t: 'Aún no lo he pensado', v: 0 }
+  ]}
+];
+
+/* ═══════════════════════════════════════
+   DIAGNÓSTICO — 30 PREGUNTAS
+═══════════════════════════════════════ */
+const AREAS = [
+  'Liderazgo y estructura organizacional',
+  'Planificación y productividad en terreno',
+  'Finanzas y flujo de caja',
+  'Abastecimiento y subcontratos',
+  'Calidad y prevención de riesgos',
+  'Tecnología y digitalización'
+];
+
+const AREA_ICONS  = ['building','chart-bar','cash','truck','shield-check','device-laptop'];
+const BAR_COLORS  = ['#185FA5','#0F6E56','#BA7517','#3B6D11','#993C1D','#534AB7'];
+
+const DIAG_QS = [
+  {a:0,q:'En el día a día, ¿cuántas decisiones de compra o autorizaciones dependen exclusivamente de ti o del dueño?',opts:[
+    {t:'Tenemos límites claros; el equipo toma decisiones operativas de forma autónoma',v:3},
+    {t:'Delego las menores, pero compras y autorizaciones importantes siempre pasan por mí',v:2},
+    {t:'Casi todo pasa por mí; sin mi disponibilidad es difícil avanzar',v:1},
+    {t:'Todo depende exclusivamente de mí; sin mi firma nada se mueve',v:0}
+  ]},
+  {a:0,q:'¿Tienen claramente definidas las responsabilidades del Administrador de Obra, el Jefe de Terreno y los capataces?',opts:[
+    {t:'Sí, tenemos organigrama y perfiles de cargo; cada uno sabe exactamente qué le corresponde',v:3},
+    {t:'Hay cierta claridad, pero a veces hay superposición o conflictos de responsabilidad',v:2},
+    {t:'Es informal; los roles se asignan según quién esté disponible',v:1},
+    {t:'No, los roles se mezclan constantemente y generan confusión en terreno',v:0}
+  ]},
+  {a:0,q:'Si te ausentas dos semanas, ¿la obra sigue su curso o se generan cuellos de botella?',opts:[
+    {t:'La obra sigue sin problemas; el equipo está capacitado para tomar decisiones',v:3},
+    {t:'Sigue, pero con dificultades y consultas frecuentes',v:2},
+    {t:'Se generan retrasos importantes y el equipo pierde el norte',v:1},
+    {t:'La obra prácticamente se detiene si no estoy presente',v:0}
+  ]},
+  {a:0,q:'¿Pasa seguido que dos personas hacen el mismo trabajo o que tareas quedan sin hacer porque "el otro lo haría"?',opts:[
+    {t:'No, tenemos procesos claros que evitan duplicidades y vacíos de responsabilidad',v:3},
+    {t:'Ocurre ocasionalmente pero lo detectamos y corregimos rápido',v:2},
+    {t:'Es frecuente y nos genera pérdida de tiempo y retrabajos',v:1},
+    {t:'Es la norma; siempre hay confusión sobre quién hace qué',v:0}
+  ]},
+  {a:0,q:'¿Cómo controlas la rotación del personal clave y qué haces para retener a los buenos maestros y profesionales?',opts:[
+    {t:'Tenemos política de retención, evaluaciones de desempeño y planes de desarrollo',v:3},
+    {t:'Hacemos algunos esfuerzos puntuales pero no es un proceso formal',v:2},
+    {t:'La rotación es alta y no tenemos estrategia clara para retener al personal clave',v:1},
+    {t:'No controlamos la rotación; perdemos buenos maestros constantemente',v:0}
+  ]},
+  {a:1,q:'¿Utilizan metodologías ágiles como Last Planner System o solo se guían por una Carta Gantt estática?',opts:[
+    {t:'Usamos Last Planner System u otra metodología ágil con reuniones semanales',v:3},
+    {t:'Tenemos Carta Gantt y la actualizamos regularmente según el avance real',v:2},
+    {t:'Tenemos Carta Gantt pero rara vez la seguimos o actualizamos',v:1},
+    {t:'No tenemos programación formal; avanzamos según lo que se presenta cada día',v:0}
+  ]},
+  {a:1,q:'¿Cómo mides semanalmente el avance físico real de la obra versus lo planificado?',opts:[
+    {t:'Medimos avance físico con indicadores (% real vs. planificado) y lo reportamos formalmente',v:3},
+    {t:'Hacemos seguimiento semanal pero de forma informal y sin indicadores claros',v:2},
+    {t:'El control es mensual o cuando el mandante lo solicita',v:1},
+    {t:'No medimos el avance sistemáticamente; lo estimamos visualmente',v:0}
+  ]},
+  {a:1,q:'Cuando la ITO o el mandante solicitan obras extraordinarias, ¿tienen proceso claro para cobrar antes de ejecutar?',opts:[
+    {t:'Sí, cotización y aprobación escrita firmada antes de ejecutar cualquier obra extraordinaria',v:3},
+    {t:'Generalmente lo hacemos, aunque a veces ejecutamos antes de confirmar el cobro',v:2},
+    {t:'Frecuentemente ejecutamos primero y después intentamos cobrar, con resultados variables',v:1},
+    {t:'No tenemos proceso; muchas obras extraordinarias quedan sin cobrar',v:0}
+  ]},
+  {a:1,q:'Al iniciar la instalación de faena, ¿diseñan el flujo de movimiento de maquinaria y cuadrillas?',opts:[
+    {t:'Sí, diseñamos el layout de faena y el flujo de trabajo antes de iniciar la obra gruesa',v:3},
+    {t:'Lo planificamos parcialmente, pero improvisamos bastante en terreno',v:2},
+    {t:'Rara vez lo planificamos; los conflictos de espacio se resuelven sobre la marcha',v:1},
+    {t:'No lo hacemos; la logística en terreno es reactiva y genera conflictos frecuentes',v:0}
+  ]},
+  {a:1,q:'¿Tienen medido el porcentaje de horas improductivas de las cuadrillas por falta de materiales o mala coordinación?',opts:[
+    {t:'Sí, medimos el % de horas improductivas y tomamos acciones correctivas con datos',v:3},
+    {t:'Tenemos una estimación aproximada pero sin medición formal',v:2},
+    {t:'Sabemos que hay tiempos muertos pero no los cuantificamos',v:1},
+    {t:'No lo medimos; desconocemos el impacto real en nuestra productividad',v:0}
+  ]},
+  {a:2,q:'¿Llevan control exacto de los días que demora el mandante en aprobar y pagar los estados de pago?',opts:[
+    {t:'Sí, registramos la antigüedad de cada estado de pago y gestionamos activamente el cobro',v:3},
+    {t:'Hacemos seguimiento pero de forma manual o poco sistemática',v:2},
+    {t:'Solo revisamos cuando hay problemas de liquidez',v:1},
+    {t:'No llevamos control; a veces no sabemos qué estados de pago están pendientes',v:0}
+  ]},
+  {a:2,q:'¿Diferencian la utilidad "en el papel" de la liquidez real disponible para pagar nóminas y leyes sociales?',opts:[
+    {t:'Sí, tenemos flujo de caja proyectado y diferenciamos claramente utilidad devengada de liquidez',v:3},
+    {t:'Lo diferenciamos conceptualmente pero no lo gestionamos con herramientas formales',v:2},
+    {t:'A veces confundimos facturación con disponibilidad; la falta de caja nos sorprende',v:1},
+    {t:'No diferenciamos; hemos recurrido a créditos para pagar nóminas inesperadamente',v:0}
+  ]},
+  {a:2,q:'¿Miden el rendimiento de costos (CPI) en tiempo real para saber si una partida específica está perdiendo plata?',opts:[
+    {t:'Sí, monitoreamos el CPI en tiempo real y tomamos acciones correctivas por partida',v:3},
+    {t:'Hacemos control de costos pero solo al cierre mensual o de partida',v:2},
+    {t:'Solo medimos costos al finalizar la obra; para entonces ya es tarde para corregir',v:1},
+    {t:'No medimos rendimiento de costos; las pérdidas las descubrimos cuando la obra termina',v:0}
+  ]},
+  {a:2,q:'¿Conocen con exactitud su tasa mensual de gastos generales (costo de mantener la empresa aunque la obra se paralice)?',opts:[
+    {t:'Sí, conocemos exactamente nuestra tasa mensual y la incluimos correctamente en los presupuestos',v:3},
+    {t:'Tenemos una estimación aproximada que ajustamos periódicamente',v:2},
+    {t:'No la calculamos formalmente; la estimamos al presupuestar cada obra',v:1},
+    {t:'No la conocemos; a veces nuestros presupuestos no cubren los gastos generales reales',v:0}
+  ]},
+  {a:2,q:'¿Tienen plan financiero para soportar retenciones de estados de pago y el costo de boletas de garantía?',opts:[
+    {t:'Sí, tenemos línea de crédito o flujo reservado para cubrir retenciones y garantías',v:3},
+    {t:'Lo gestionamos caso a caso pero sin plan financiero formal',v:2},
+    {t:'Las retenciones nos afectan el flujo pero no tenemos estrategia para mitigarlo',v:1},
+    {t:'Las retenciones y garantías nos han generado crisis de liquidez en más de una ocasión',v:0}
+  ]},
+  {a:3,q:'Al comprar materiales, ¿solo buscan la cotización más barata o evalúan también plazo de entrega y calidad?',opts:[
+    {t:'Evaluamos precio, plazo de entrega, calidad y servicio con criterios definidos por escrito',v:3},
+    {t:'Consideramos precio y plazo, pero el precio sigue siendo el factor dominante',v:2},
+    {t:'Generalmente elegimos al proveedor más barato sin evaluar otros factores',v:1},
+    {t:'Solo miramos precio; hemos tenido problemas por mala calidad o entregas tardías',v:0}
+  ]},
+  {a:3,q:'¿Qué tan frecuente es que la obra se paralice porque el material no llegó a tiempo a la bodega?',opts:[
+    {t:'Muy poco frecuente; tenemos control de inventario y compras anticipadas planificadas',v:3},
+    {t:'Ocurre ocasionalmente pero lo resolvemos rápido',v:2},
+    {t:'Es frecuente y nos genera retrasos y costos adicionales',v:1},
+    {t:'Es un problema recurrente que paraliza la obra con regularidad',v:0}
+  ]},
+  {a:3,q:'Para partidas críticas como hormigón o acero, ¿tienen proveedores backup si el principal les falla?',opts:[
+    {t:'Sí, tenemos al menos un proveedor alternativo homologado para cada material crítico',v:3},
+    {t:'Para algunos materiales críticos sí, pero no para todos',v:2},
+    {t:'No formalmente; buscamos alternativas cuando el problema ya ocurrió',v:1},
+    {t:'No, dependemos de un solo proveedor para la mayoría de los materiales críticos',v:0}
+  ]},
+  {a:3,q:'¿Llevan control estricto de que sus subcontratistas paguen imposiciones (F30 y F30-1) para evitar responsabilidad solidaria?',opts:[
+    {t:'Sí, exigimos F30 y F30-1 mensualmente y no cursamos estados de pago sin ellos',v:3},
+    {t:'Lo hacemos en general, pero a veces se nos escapa algún subcontratista',v:2},
+    {t:'Lo pedimos pero no siempre verificamos que estén al día',v:1},
+    {t:'No controlamos las imposiciones de subcontratistas; desconocemos nuestra exposición legal',v:0}
+  ]},
+  {a:3,q:'¿Realizan inventarios periódicos en bodega de obra para evitar mermas, robos o pérdidas de herramientas?',opts:[
+    {t:'Sí, inventarios periódicos con kardex actualizado y control de entradas/salidas',v:3},
+    {t:'Hacemos inventarios ocasionalmente pero sin sistema formal',v:2},
+    {t:'Solo hacemos inventario al inicio y fin de obra',v:1},
+    {t:'No llevamos control de bodega; las mermas y pérdidas son un costo asumido',v:0}
+  ]},
+  {a:4,q:'¿Tienen prevencionista activo que realice las charlas ODI y mantenga la tasa de accidentabilidad al mínimo?',opts:[
+    {t:'Sí, prevencionista dedicado, charlas ODI diarias y tasa de accidentabilidad bajo control',v:3},
+    {t:'Tenemos prevencionista a tiempo parcial o compartido y cumplimos lo básico',v:2},
+    {t:'Cumplimos los mínimos legales pero la seguridad no es prioridad real en terreno',v:1},
+    {t:'La seguridad es reactiva; actuamos solo ante accidentes o visitas de inspección',v:0}
+  ]},
+  {a:4,q:'¿Mantienen actualizados registros de inducciones firmadas, entregas de EPP y el Libro de Subcontratación?',opts:[
+    {t:'Sí, todo al día: inducciones firmadas, registros de EPP y Libro de Subcontratación actualizado',v:3},
+    {t:'Generalmente al día, pero con algunos documentos pendientes o atrasados',v:2},
+    {t:'Tenemos los documentos pero a menudo desactualizados o incompletos',v:1},
+    {t:'La documentación laboral es un punto débil; nos ha generado problemas con la ITO',v:0}
+  ]},
+  {a:4,q:'Durante las terminaciones, ¿utilizan protocolos o checklists para evitar que la ITO rechace las partidas?',opts:[
+    {t:'Sí, usamos protocolos y checklists formales por partida antes de llamar a la ITO',v:3},
+    {t:'Hacemos revisiones pero sin checklists formalizados',v:2},
+    {t:'La revisión depende del criterio del profesional a cargo; no hay estándar',v:1},
+    {t:'No, las observaciones de la ITO son nuestra forma de control de calidad; es reactivo',v:0}
+  ]},
+  {a:4,q:'¿Miden cuánto dinero pierden al mes por tener que demoler y volver a hacer un trabajo mal ejecutado?',opts:[
+    {t:'Sí, medimos el rework rate y mantenemos acciones correctivas documentadas',v:3},
+    {t:'Tenemos estimación general pero sin medición formal por partida',v:2},
+    {t:'Sabemos que hay reprocesos pero no cuantificamos el costo real',v:1},
+    {t:'No lo medimos; los reprocesos se absorben como costo inevitable del negocio',v:0}
+  ]},
+  {a:4,q:'¿Tienen equipo o procedimiento formal para atender garantías y postventa una vez entregado el proyecto?',opts:[
+    {t:'Sí, proceso formal de postventa con responsables y tiempos de respuesta definidos',v:3},
+    {t:'Atendemos la postventa pero de forma reactiva y sin proceso formalizado',v:2},
+    {t:'La postventa depende de la buena voluntad del equipo; no hay proceso claro',v:1},
+    {t:'No tenemos postventa formal; es una fuente recurrente de conflictos con clientes',v:0}
+  ]},
+  {a:5,q:'¿Controlan la obra con planillas Excel y WhatsApp o ya utilizan un software de gestión especializado?',opts:[
+    {t:'Usamos ERP o software especializado en construcción para proyectos, costos y compras',v:3},
+    {t:'Usamos algunas herramientas digitales especializadas aunque no integradas entre sí',v:2},
+    {t:'Usamos Excel avanzado y WhatsApp; funciona pero con limitaciones importantes',v:1},
+    {t:'Solo Excel básico y comunicación informal; perdemos información con frecuencia',v:0}
+  ]},
+  {a:5,q:'¿Cómo controlan las horas reales trabajadas por maestros y subcontratos para el pago de nómina?',opts:[
+    {t:'Sistema digital (app o biométrico) que registra horas reales e integra con nómina',v:3},
+    {t:'Tenemos control manual o semi-digital que revisamos para el pago',v:2},
+    {t:'Usamos planillas en papel que alguien transcribe manualmente',v:1},
+    {t:'El control es informal; basado en la palabra del capataz o del subcontratista',v:0}
+  ]},
+  {a:5,q:'¿Tienen planos, RDI y especificaciones técnicas centralizados en la nube con control de versiones para terreno?',opts:[
+    {t:'Sí, plataforma en la nube con control de versiones y acceso desde terreno en tiempo real',v:3},
+    {t:'Usamos nube (Drive, Dropbox) pero sin control formal de versiones',v:2},
+    {t:'Los documentos están en computadores locales; actualizarlos en terreno es un problema',v:1},
+    {t:'No, trabajamos con planos impresos; es frecuente construir con versiones desactualizadas',v:0}
+  ]},
+  {a:5,q:'¿Los profesionales de obra usan tablets o celulares para levantar no conformidades e incidencias en terreno?',opts:[
+    {t:'Sí, el equipo usa apps para reportes diarios, NCR y registro fotográfico de avance',v:3},
+    {t:'Usamos algunos medios digitales pero con resistencia del equipo o uso inconsistente',v:2},
+    {t:'Los reportes se hacen en papel o WhatsApp y alguien los transcribe después',v:1},
+    {t:'No hay reporte diario formal de terreno',v:0}
+  ]},
+  {a:5,q:'¿Han evaluado o implementado BIM para adelantarse a interferencias entre especialidades antes de construir?',opts:[
+    {t:'Sí, usamos BIM activamente para coordinación de especialidades y gestión de interferencias',v:3},
+    {t:'Hemos evaluado BIM o lo usamos parcialmente en algunos proyectos',v:2},
+    {t:'Conocemos BIM pero no lo hemos implementado; está en los planes',v:1},
+    {t:'No lo consideramos relevante para nuestro tipo de proyectos',v:0}
+  ]}
+];
+
+const REGIONES = [
+  'Arica y Parinacota','Tarapacá','Antofagasta','Atacama','Coquimbo',
+  'Valparaíso','Metropolitana','O\'Higgins','Maule','Ñuble','Biobío',
+  'La Araucanía','Los Ríos','Los Lagos','Aysén','Magallanes'
+];
+
+const ESPECIALIDADES = [
+  'Obras civiles','Edificación habitacional','Edificación comercial / oficinas',
+  'Infraestructura vial','Obras industriales','Montaje e instalaciones',
+  'Obras de sanitaria / agua potable','Paisajismo y urbanización','Otra'
+];
+
+/* ═══════════════════════════════════════
+   HELPERS
+═══════════════════════════════════════ */
+function pct(v, max) { return max > 0 ? Math.round((v / max) * 100) : 0; }
+
+function updateStages(active) {
+  ['sd1','sd2','sd3','sd4'].forEach((id, i) => {
+    const el = document.getElementById(id);
+    el.className = 'stage-dot';
+    if (i + 1 < active) el.classList.add('done');
+    else if (i + 1 === active) el.classList.add('active');
+  });
+}
+
+function setView(html) { document.getElementById('view').innerHTML = html; }
+
+/* ═══════════════════════════════════════
+   ETAPA 1 — FORMULARIO DE CONTACTO
+═══════════════════════════════════════ */
+function initApp() {
+  updateStages(1);
+  document.getElementById('prog-bar').style.display = 'none';
+  renderContact();
+}
+
+function renderContact() {
+  setView(`
+    <div class="section-tag">Paso 1 de 4 — Tus datos</div>
+    <h2>Cuéntanos sobre ti y tu empresa</h2>
+    <p class="subtitle">Completa tus datos para comenzar el diagnóstico. Los campos marcados con <span style="color:#A32D2D">*</span> son obligatorios.</p>
+
+    <div class="form-grid">
+      <div class="form-group full">
+        <label>Nombre completo <span class="req">*</span></label>
+        <input type="text" id="f-nombre" placeholder="Ej: Carlos Mena" />
+        <span class="field-error" id="e-nombre">Ingresa tu nombre completo.</span>
+      </div>
+      <div class="form-group">
+        <label>Correo electrónico <span class="req">*</span></label>
+        <input type="email" id="f-email" placeholder="correo@empresa.cl" />
+        <span class="field-error" id="e-email">Ingresa un email válido.</span>
+      </div>
+      <div class="form-group">
+        <label>Teléfono <span class="req">*</span></label>
+        <input type="tel" id="f-telefono" placeholder="+56 9 1234 5678" />
+        <span class="field-error" id="e-telefono">Ingresa tu número de teléfono.</span>
+      </div>
+      <div class="form-group">
+        <label>Empresa</label>
+        <input type="text" id="f-empresa" placeholder="Constructora XYZ" />
+      </div>
+      <div class="form-group">
+        <label>RUT empresa</label>
+        <input type="text" id="f-rut" placeholder="76.123.456-7" />
+      </div>
+      <div class="form-group">
+        <label>Cargo</label>
+        <input type="text" id="f-cargo" placeholder="Ej: Gerente General" />
+      </div>
+      <div class="form-group">
+        <label>Región</label>
+        <select id="f-region">
+          <option value="">Selecciona una región</option>
+          ${REGIONES.map(r => `<option value="${r}">${r}</option>`).join('')}
+        </select>
+      </div>
+      <div class="form-group full">
+        <label>Especialidad principal</label>
+        <select id="f-especialidad">
+          <option value="">Selecciona una especialidad</option>
+          ${ESPECIALIDADES.map(e => `<option value="${e}">${e}</option>`).join('')}
+        </select>
+      </div>
+    </div>
+
+    <div class="nav">
+      <span></span>
+      <span></span>
+      <button class="btn btn-primary" onclick="submitContact()">Comenzar evaluación →</button>
+    </div>
+  `);
+}
+
+function submitContact() {
+  const nombre     = document.getElementById('f-nombre').value.trim();
+  const email      = document.getElementById('f-email').value.trim();
+  const telefono   = document.getElementById('f-telefono').value.trim();
+  const empresa    = document.getElementById('f-empresa').value.trim();
+  const rut        = document.getElementById('f-rut').value.trim();
+  const cargo      = document.getElementById('f-cargo').value.trim();
+  const region     = document.getElementById('f-region').value;
+  const especialidad = document.getElementById('f-especialidad').value;
+
+  let ok = true;
+
+  function validate(id, errId, cond) {
+    const el  = document.getElementById(id);
+    const err = document.getElementById(errId);
+    if (!cond) { el.classList.add('error'); err.classList.add('show'); ok = false; }
+    else        { el.classList.remove('error'); err.classList.remove('show'); }
+  }
+
+  validate('f-nombre',   'e-nombre',   nombre.length >= 2);
+  validate('f-email',    'e-email',    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email));
+  validate('f-telefono', 'e-telefono', telefono.length >= 8);
+
+  if (!ok) return;
+
+  contactData = { nombre, email, telefono, empresa, rut, cargo, region, especialidad };
+  filterAns   = new Array(7).fill(null);
+  filterCur   = 0;
+  currentStage = 'filter';
+  updateStages(2);
+  document.getElementById('prog-bar').style.display = 'block';
+  renderFilter();
+}
+
+/* ═══════════════════════════════════════
+   ETAPA 2 — FILTRO RÁPIDO
+═══════════════════════════════════════ */
+function renderFilter() {
+  const q    = FILTER_QS[filterCur];
+  const prog = Math.round(((filterCur + 1) / FILTER_QS.length) * 100);
+  document.getElementById('pf').style.width = prog + '%';
+
+  setView(`
+    <div class="section-tag">Paso 2 de 4 — Filtro de perfil</div>
+    <div style="font-size:17px;font-weight:500;color:#1a1a18;margin-bottom:.3rem;line-height:1.45">${q.q}</div>
+    <div class="q-num">Pregunta ${filterCur + 1} de ${FILTER_QS.length}</div>
+    <div class="opts">
+      ${q.opts.map((o, i) => `
+        <button class="ob${filterAns[filterCur] === i ? ' sel' : ''}" onclick="pickFilter(${i})">
+          <div class="oc"><div class="od"></div></div>
+          <div class="ot">${o.t}</div>
+        </button>
+      `).join('')}
+    </div>
+    <div class="nav">
+      ${filterCur > 0 ? '<button class="btn" onclick="goFilter(-1)">← Anterior</button>' : '<span></span>'}
+      <span class="nc">${filterCur + 1} / ${FILTER_QS.length}</span>
+      <button class="btn btn-primary" id="fnb" ${filterAns[filterCur] === null ? 'disabled' : ''} onclick="goFilter(1)">
+        ${filterCur === FILTER_QS.length - 1 ? 'Ver resultado →' : 'Siguiente →'}
+      </button>
+    </div>
+  `);
+}
+
+function pickFilter(i) {
+  filterAns[filterCur] = i;
+  document.querySelectorAll('.ob').forEach((b, j) => b.classList.toggle('sel', j === i));
+  const nb = document.getElementById('fnb');
+  if (nb) nb.disabled = false;
+}
+
+function goFilter(d) {
+  filterCur += d;
+  if (filterCur >= FILTER_QS.length) { showFilterResult(); return; }
+  renderFilter();
+  window.scrollTo(0, 0);
+}
+
+function filterScore() {
+  return filterAns.reduce((s, a, i) => a !== null ? s + FILTER_QS[i].opts[a].v : s, 0);
+}
+
+function showFilterResult() {
+  document.getElementById('pf').style.width = '100%';
+  currentStage = 'filter-result';
+  updateStages(2);
+
+  const score    = filterScore();
+  const MAX      = FILTER_QS.length * 3;
+  const totalPct = pct(score, MAX);
+
+  let tier, tierBadge, boxClass, msg, showDiag;
+
+  if (totalPct >= 60) {
+    tier = 'Perfil calificado'; tierBadge = 'badge-success'; boxClass = 'qualified';
+    msg  = 'Tu perfil encaja bien con el tipo de empresa con la que trabajamos. Te invitamos a completar el diagnóstico detallado para identificar tus áreas de mayor oportunidad.';
+    showDiag = true;
+  } else if (totalPct >= 35) {
+    tier = 'Perfil en evaluación'; tierBadge = 'badge-warning'; boxClass = 'borderline';
+    msg  = 'Hay elementos interesantes en tu perfil. Te invitamos igualmente a completar el diagnóstico para tener una visión más completa antes de conversar.';
+    showDiag = true;
+  } else {
+    tier = 'Por ahora no es el momento'; tierBadge = 'badge-danger'; boxClass = 'disqualified';
+    msg  = 'En base a tu perfil actual, no creemos que sea el momento ideal para una asesoría. Te invitamos a volver cuando las condiciones de tu empresa cambien.';
+    showDiag = false;
+  }
+
+  const waMsg = encodeURIComponent(`Hola, completé la evaluación de perfil en tu plataforma con un ${totalPct}% (${tier}). Me gustaría tener más información.`);
+
+  setView(`
+    <div class="section-tag">Resultado del filtro de perfil</div>
+    <h2 style="margin-bottom:.25rem">Tu perfil de empresa</h2>
+    <p class="subtitle" style="margin-bottom:1.25rem">Basado en 7 preguntas de perfil y fit</p>
+
+    <div class="result-box ${boxClass}" style="margin-bottom:1.25rem">
+      <div class="result-score">${totalPct}<span style="font-size:20px;color:#6b6a65">%</span></div>
+      <div class="result-label">sobre 100 puntos posibles</div>
+      <span class="badge ${tierBadge}">${tier}</span>
+      <p style="font-size:13px;color:#6b6a65;line-height:1.5;margin-top:.5rem">${msg}</p>
+    </div>
+
+    ${showDiag ? `
+      <button class="btn btn-primary" style="width:100%;justify-content:center;display:flex;padding:11px" onclick="startDiag()">
+        Continuar al diagnóstico completo →
+      </button>
+    ` : `
+      <a class="btn-wa" href="https://wa.me/${WA_NUMBER}?text=${waMsg}" target="_blank">
+        <i class="ti ti-brand-whatsapp"></i> Escribir de todos modos
+      </a>
+    `}
+  `);
+
+  if (!showDiag) saveProspect(totalPct, tier, null, null, null);
+}
+
+/* ═══════════════════════════════════════
+   ETAPA 3 — DIAGNÓSTICO 30 PREGUNTAS
+═══════════════════════════════════════ */
+function startDiag() {
+  diagAns  = new Array(30).fill(null);
+  diagCur  = 0;
+  currentStage = 'diag';
+  updateStages(3);
+  renderDiag();
+}
+
+function renderDiag() {
+  const q    = DIAG_QS[diagCur];
+  const prog = Math.round(((diagCur + 1) / DIAG_QS.length) * 100);
+  document.getElementById('pf').style.width = prog + '%';
+
+  setView(`
+    <div class="section-tag">
+      <i class="ti ti-${AREA_ICONS[q.a]}" style="font-size:12px;margin-right:4px"></i>
+      Área ${q.a + 1}: ${AREAS[q.a]}
+    </div>
+    <div style="font-size:16px;font-weight:500;color:#1a1a18;margin-bottom:.3rem;line-height:1.45">${q.q}</div>
+    <div class="q-num">Paso 3 de 4 — Pregunta ${diagCur + 1} de ${DIAG_QS.length}</div>
+    <div class="opts">
+      ${q.opts.map((o, i) => `
+        <button class="ob${diagAns[diagCur] === i ? ' sel' : ''}" onclick="pickDiag(${i})">
+          <div class="oc"><div class="od"></div></div>
+          <div class="ot">${o.t}</div>
+        </button>
+      `).join('')}
+    </div>
+    <div class="nav">
+      ${diagCur > 0 ? '<button class="btn" onclick="goDiag(-1)">← Anterior</button>' : '<span></span>'}
+      <span class="nc">${diagCur + 1} / ${DIAG_QS.length}</span>
+      <button class="btn btn-primary" id="dnb" ${diagAns[diagCur] === null ? 'disabled' : ''} onclick="goDiag(1)">
+        ${diagCur === DIAG_QS.length - 1 ? 'Ver diagnóstico →' : 'Siguiente →'}
+      </button>
+    </div>
+  `);
+}
+
+function pickDiag(i) {
+  diagAns[diagCur] = i;
+  document.querySelectorAll('.ob').forEach((b, j) => b.classList.toggle('sel', j === i));
+  const nb = document.getElementById('dnb');
+  if (nb) nb.disabled = false;
+}
+
+function goDiag(d) {
+  diagCur += d;
+  if (diagCur >= DIAG_QS.length) { showDiagResult(); return; }
+  renderDiag();
+  window.scrollTo(0, 0);
+}
+
+/* ═══════════════════════════════════════
+   ETAPA 4 — RESULTADO DIAGNÓSTICO
+═══════════════════════════════════════ */
+function areaScore(a) {
+  let s = 0, n = 0;
+  DIAG_QS.forEach((q, i) => { if (q.a === a && diagAns[i] !== null) { s += DIAG_QS[i].opts[diagAns[i]].v; n++; } });
+  return { score: s, max: n * 3 };
+}
+
+function diagTotalScore() {
+  return DIAG_QS.reduce((s, q, i) => diagAns[i] !== null ? s + DIAG_QS[i].opts[diagAns[i]].v : s, 0);
+}
+
+function showDiagResult() {
+  document.getElementById('pf').style.width = '100%';
+  currentStage = 'diag-result';
+  updateStages(4);
+
+  const total     = diagTotalScore();
+  const MAX_TOTAL = DIAG_QS.length * 3;
+  const totalPct  = pct(total, MAX_TOTAL);
+  const aScores   = AREAS.map((_, a) => areaScore(a));
+  const weakAreas = [...aScores.map((s, a) => ({ a, p: pct(s.score, s.max) }))]
+    .sort((a, b) => a.p - b.p).slice(0, 3).map(x => AREAS[x.a]);
+
+  let tier, tierBadge, ctaCls, ctaH, ctaB;
+  if (totalPct >= 65) {
+    tier = 'Empresa bien gestionada'; tierBadge = 'badge-success'; ctaCls = 'cta-s';
+    ctaH = 'Oportunidades de optimización avanzada';
+    ctaB = 'Llevas tu empresa con solidez. En construcción la diferencia entre una empresa buena y una muy rentable está en los detalles. Conversemos sobre cómo llevar tu gestión al siguiente nivel.';
+  } else if (totalPct >= 40) {
+    tier = 'Brechas críticas identificadas'; tierBadge = 'badge-warning'; ctaCls = 'cta-w';
+    ctaH = 'Este es el momento de actuar';
+    ctaB = 'Tu diagnóstico revela brechas importantes en áreas que impactan directamente tu rentabilidad y flujo de caja. Una sesión 1 a 1 puede ayudarte a priorizar dónde atacar primero.';
+  } else {
+    tier = 'Situación de alto riesgo operacional'; tierBadge = 'badge-danger'; ctaCls = 'cta-d';
+    ctaH = 'Requieres intervención urgente';
+    ctaB = 'Tu empresa enfrenta vulnerabilidades severas en múltiples frentes. El costo de no actuar hoy puede ser mucho más alto que el de una asesoría. Conversemos esta semana.';
+  }
+
+  const filterPct = pct(filterScore(), FILTER_QS.length * 3);
+
+  saveProspect(filterPct, null, totalPct, tier, aScores);
+
+  const waMsg = encodeURIComponent(
+    `Hola, acabo de completar el diagnóstico de gestión para pymes constructoras.\n\nMis resultados:\n• Filtro de perfil: ${filterPct}%\n• Diagnóstico de gestión: ${totalPct}% (${tier})\n• Áreas con más brechas: ${weakAreas.join(', ')}\n\nMe gustaría agendar una sesión contigo.`
+  );
+  const waUrl = `https://wa.me/${WA_NUMBER}?text=${waMsg}`;
+
+  setView(`
+    <div class="section-tag">Paso 4 de 4 — Tu diagnóstico</div>
+    <h2 style="margin-bottom:.25rem">Resultado de gestión</h2>
+    <p class="subtitle" style="margin-bottom:1.25rem">Basado en 30 preguntas en 6 áreas clave</p>
+
+    <div class="rc">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
+        <div>
+          <div style="font-size:13px;color:#6b6a65;margin-bottom:2px">Puntaje global</div>
+          <div style="display:flex;align-items:baseline;gap:6px">
+            <span style="font-size:38px;font-weight:500;color:#1a1a18;line-height:1">${totalPct}</span>
+            <span style="font-size:18px;color:#9b9a95;font-weight:500">/ 100</span>
+          </div>
+        </div>
+        <span class="badge ${tierBadge}">${tier}</span>
+      </div>
+      ${aScores.map((s, a) => {
+        const p = pct(s.score, s.max);
+        return `<div class="area-bar-wrap">
+          <div class="area-bar-label">
+            <span class="area-bar-name">
+              <i class="ti ti-${AREA_ICONS[a]}" style="font-size:13px;margin-right:5px;color:#9b9a95"></i>${AREAS[a]}
+            </span>
+            <span class="area-bar-pct">${p}%</span>
+          </div>
+          <div class="area-bar">
+            <div class="area-bar-fill" style="width:${p}%;background:${BAR_COLORS[a]}"></div>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>
+
+    <div class="rc">
+      <div style="font-size:13px;font-weight:500;color:#1a1a18;margin-bottom:.5rem">Áreas con mayor brecha</div>
+      <ul class="weak-list">
+        ${weakAreas.map(w => `<li><i class="ti ti-alert-triangle" style="color:#BA7517;font-size:14px"></i>${w}</li>`).join('')}
+      </ul>
+    </div>
+
+    <div class="cta-block ${ctaCls}">
+      <div class="cta-h">${ctaH}</div>
+      <div class="cta-b">${ctaB}</div>
+      <a class="btn-wa" href="${waUrl}" target="_blank">
+        <i class="ti ti-brand-whatsapp"></i> Agendar sesión 1 a 1 por WhatsApp
+      </a>
+    </div>
+
+    <div style="margin-top:1rem;text-align:center">
+      <button class="btn" onclick="restart()" style="font-size:12px;color:#9b9a95">Volver al inicio</button>
+    </div>
+  `);
+}
+
+/* ═══════════════════════════════════════
+   BASE DE DATOS — localStorage
+═══════════════════════════════════════ */
+function saveProspect(filterPct, filterTier, diagPct, diagTier, aScores) {
+  const db = loadDB();
+  const now = new Date();
+  const fecha = now.toLocaleDateString('es-CL') + ' ' + now.toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' });
+
+  const record = {
+    fecha,
+    nombre:      contactData.nombre      || '',
+    email:       contactData.email       || '',
+    telefono:    contactData.telefono    || '',
+    empresa:     contactData.empresa     || '',
+    rut:         contactData.rut         || '',
+    cargo:       contactData.cargo       || '',
+    region:      contactData.region      || '',
+    especialidad: contactData.especialidad || '',
+    filtro_pct:  filterPct,
+    filtro_tier: filterTier || (filterPct >= 60 ? 'Calificado' : filterPct >= 35 ? 'En evaluación' : 'No calificado'),
+    diag_pct:    diagPct !== null ? diagPct : '—',
+    diag_tier:   diagTier || '—',
+    area_liderazgo:     aScores ? pct(aScores[0].score, aScores[0].max) : '—',
+    area_planificacion: aScores ? pct(aScores[1].score, aScores[1].max) : '—',
+    area_finanzas:      aScores ? pct(aScores[2].score, aScores[2].max) : '—',
+    area_abastecimiento:aScores ? pct(aScores[3].score, aScores[3].max) : '—',
+    area_calidad:       aScores ? pct(aScores[4].score, aScores[4].max) : '—',
+    area_tecnologia:    aScores ? pct(aScores[5].score, aScores[5].max) : '—',
+  };
+
+  db.push(record);
+  saveDB(db);
+}
+
+function restart() {
+  contactData = {};
+  filterAns   = new Array(7).fill(null);
+  diagAns     = new Array(30).fill(null);
+  filterCur   = 0;
+  diagCur     = 0;
+  currentStage = 'contact';
+  updateStages(1);
+  document.getElementById('prog-bar').style.display = 'none';
+  renderContact();
+  window.scrollTo(0, 0);
+}
+
+/* ═══════════════════════════════════════
+   PANEL ADMIN
+═══════════════════════════════════════ */
+function renderAdmin() {
+  document.body.style.alignItems = 'flex-start';
+  const db = loadDB();
+
+  const total       = db.length;
+  const calificados = db.filter(r => r.filtro_pct >= 60).length;
+  const conDiag     = db.filter(r => r.diag_pct !== '—').length;
+  const avgDiag     = conDiag > 0
+    ? Math.round(db.filter(r => r.diag_pct !== '—').reduce((s, r) => s + r.diag_pct, 0) / conDiag)
+    : '—';
+
+  document.getElementById('admin-stats').innerHTML = `
+    <div class="stat-card"><div class="stat-label">Total prospectos</div><div class="stat-val">${total}</div></div>
+    <div class="stat-card"><div class="stat-label">Perfil calificado (≥60%)</div><div class="stat-val">${calificados}</div></div>
+    <div class="stat-card"><div class="stat-label">Completaron diagnóstico</div><div class="stat-val">${conDiag}</div></div>
+    <div class="stat-card"><div class="stat-label">Promedio diagnóstico</div><div class="stat-val">${avgDiag}${avgDiag !== '—' ? '%' : ''}</div></div>
+  `;
+
+  if (db.length === 0) {
+    document.getElementById('admin-table').innerHTML = '<div class="empty-admin"><i class="ti ti-inbox" style="font-size:32px;display:block;margin-bottom:.5rem"></i>Aún no hay prospectos registrados.</div>';
+    return;
+  }
+
+  function pill(pct) {
+    if (pct === '—') return '<span class="pill pill-gray">—</span>';
+    if (pct >= 65)   return `<span class="pill pill-green">${pct}%</span>`;
+    if (pct >= 40)   return `<span class="pill pill-yellow">${pct}%</span>`;
+    return `<span class="pill pill-red">${pct}%</span>`;
+  }
+
+  function filterPill(p) {
+    if (p >= 60) return `<span class="pill pill-green">${p}%</span>`;
+    if (p >= 35) return `<span class="pill pill-yellow">${p}%</span>`;
+    return `<span class="pill pill-red">${p}%</span>`;
+  }
+
+  const rows = [...db].reverse().map(r => `
+    <tr>
+      <td>${r.fecha}</td>
+      <td><strong>${r.nombre}</strong></td>
+      <td>${r.empresa || '—'}</td>
+      <td>${r.cargo || '—'}</td>
+      <td>${r.email}</td>
+      <td>${r.telefono}</td>
+      <td>${r.region || '—'}</td>
+      <td>${r.especialidad || '—'}</td>
+      <td>${r.rut || '—'}</td>
+      <td>${filterPill(r.filtro_pct)}</td>
+      <td>${pill(r.diag_pct)}</td>
+      <td>${r.diag_tier !== '—' ? `<span style="font-size:11px;color:#6b6a65">${r.diag_tier}</span>` : '—'}</td>
+      <td>${pill(r.area_liderazgo)}</td>
+      <td>${pill(r.area_planificacion)}</td>
+      <td>${pill(r.area_finanzas)}</td>
+      <td>${pill(r.area_abastecimiento)}</td>
+      <td>${pill(r.area_calidad)}</td>
+      <td>${pill(r.area_tecnologia)}</td>
+    </tr>
+  `).join('');
+
+  document.getElementById('admin-table').innerHTML = `
+    <table>
+      <thead>
+        <tr>
+          <th>Fecha</th>
+          <th>Nombre</th>
+          <th>Empresa</th>
+          <th>Cargo</th>
+          <th>Email</th>
+          <th>Teléfono</th>
+          <th>Región</th>
+          <th>Especialidad</th>
+          <th>RUT</th>
+          <th>Filtro</th>
+          <th>Diagnóstico</th>
+          <th>Clasificación</th>
+          <th>Liderazgo</th>
+          <th>Planificación</th>
+          <th>Finanzas</th>
+          <th>Abastecimiento</th>
+          <th>Calidad</th>
+          <th>Tecnología</th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>
+  `;
+}
+
+/* ═══════════════════════════════════════
+   EXPORTAR A EXCEL
+═══════════════════════════════════════ */
+function exportExcel() {
+  const db = loadDB();
+  if (db.length === 0) { alert('No hay datos para exportar.'); return; }
+
+  const headers = [
+    'Fecha','Nombre','Empresa','Cargo','Email','Teléfono','Región','Especialidad','RUT empresa',
+    'Filtro perfil (%)','Diagnóstico (%)','Clasificación diagnóstico',
+    'Liderazgo (%)','Planificación (%)','Finanzas (%)','Abastecimiento (%)','Calidad (%)','Tecnología (%)'
+  ];
+
+  const rows = db.map(r => [
+    r.fecha, r.nombre, r.empresa, r.cargo, r.email, r.telefono, r.region, r.especialidad, r.rut,
+    r.filtro_pct, r.diag_pct, r.diag_tier,
+    r.area_liderazgo, r.area_planificacion, r.area_finanzas,
+    r.area_abastecimiento, r.area_calidad, r.area_tecnologia
+  ]);
+
+  const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+
+  ws['!cols'] = headers.map((h, i) => ({ wch: i < 2 ? 22 : i < 9 ? 18 : 14 }));
+
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Prospectos');
+
+  const fecha = new Date().toLocaleDateString('es-CL').replace(/\//g, '-');
+  XLSX.writeFile(wb, `prospectos_constructoras_${fecha}.xlsx`);
+}
+
+/* ═══════════════════════════════════════
+   ROUTING — al final, después de todas las definiciones
+═══════════════════════════════════════ */
+if (new URLSearchParams(location.search).get('admin') === '1') {
+  document.getElementById('app').style.display   = 'none';
+  document.getElementById('admin').style.display = 'block';
+  renderAdmin();
+} else {
+  initApp();
+}
+</script>
+</body>
+</html>
