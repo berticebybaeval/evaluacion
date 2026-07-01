@@ -423,7 +423,7 @@
   <div class="logo-row">
     <div class="logo-icon"><i class="ti ti-building"></i></div>
     <div>
-      <div class="logo-text">Diagnóstico Constructoras</div>
+      <div class="logo-text">Diagnóstico Integral para Empresas del Rubro Construcción</div>
       <div class="logo-sub">Evaluación de gestión empresarial</div>
     </div>
   </div>
@@ -483,12 +483,12 @@ function saveDB(db) { localStorage.setItem(DB_KEY, JSON.stringify(db)); }
 /* ═══════════════════════════════════════
    ESTADO GLOBAL
 ═══════════════════════════════════════ */
-let contactData = {};
-let filterAns   = new Array(7).fill(null);
-let diagAns     = new Array(7).fill(null);
-let filterCur   = 0;
-let diagCur     = 0;
-let currentStage = 'contact'; // contact | filter | filter-result | diag | diag-result
+let contactData  = {};
+let questionAns  = [];
+let questionCur  = 0;
+let diagAns      = [];
+let diagCur      = 0;
+let currentStage = 'landing';
 
 /* ═══════════════════════════════════════
    FILTRO RÁPIDO — 7 PREGUNTAS
@@ -616,6 +616,8 @@ const ESPECIALIDADES = [
 function pct(v, max) { return max > 0 ? Math.round((v / max) * 100) : 0; }
 
 function updateStages(active) {
+  const ind = document.querySelector('.stage-indicator');
+  if (ind) ind.style.display = active === 0 ? 'none' : 'flex';
   ['sd1','sd2','sd3','sd4'].forEach((id, i) => {
     const el = document.getElementById(id);
     el.className = 'stage-dot';
@@ -627,47 +629,149 @@ function updateStages(active) {
 function setView(html) { document.getElementById('view').innerHTML = html; }
 
 /* ═══════════════════════════════════════
-   ETAPA 1 — FORMULARIO DE CONTACTO
+   PANTALLA 1 — LANDING
 ═══════════════════════════════════════ */
 function initApp() {
-  updateStages(1);
+  updateStages(0);
   document.getElementById('prog-bar').style.display = 'none';
-  renderContact();
+  renderLanding();
 }
 
-function renderContact() {
+function renderLanding() {
+  currentStage = 'landing';
+  updateStages(0);
+  document.getElementById('prog-bar').style.display = 'none';
   setView(`
-    <div class="section-tag">Paso 1 de 4 — Tus datos</div>
-    <h2>Cuéntanos sobre ti y tu empresa</h2>
-    <p class="subtitle">Completa tus datos para comenzar el diagnóstico. Los campos marcados con <span style="color:var(--red)">*</span> son obligatorios.</p>
+    <div style="text-align:center;padding:1.5rem 0 .5rem">
+      <div style="display:inline-flex;align-items:center;justify-content:center;width:60px;height:60px;background:var(--accent);border-radius:14px;margin-bottom:1.25rem">
+        <i class="ti ti-building" style="font-size:30px;color:white"></i>
+      </div>
+      <h2 style="font-size:20px;line-height:1.35;margin-bottom:.75rem">
+        Diagnóstico Integral de Gestión para Empresas y Contratistas de la Construcción
+      </h2>
+      <p class="subtitle" style="max-width:480px;margin:0 auto 2rem">
+        Descubre en pocos minutos dónde están los cuellos de botella de tu operación. Servicio exclusivo y sin costo para empresas que califiquen.
+      </p>
+      <button class="btn btn-primary" style="padding:12px 32px;font-size:15px" onclick="startQuestions()">
+        Iniciar Test de Calificación
+      </button>
+      <div style="margin-top:1.75rem;display:flex;align-items:center;justify-content:center;gap:1.75rem;flex-wrap:wrap">
+        <span style="font-size:12px;color:var(--txt3);display:flex;align-items:center;gap:5px"><i class="ti ti-clock" style="font-size:14px"></i>Solo 5 minutos</span>
+        <span style="font-size:12px;color:var(--txt3);display:flex;align-items:center;gap:5px"><i class="ti ti-shield-check" style="font-size:14px"></i>100% confidencial</span>
+        <span style="font-size:12px;color:var(--txt3);display:flex;align-items:center;gap:5px"><i class="ti ti-chart-bar" style="font-size:14px"></i>Resultado a medida</span>
+      </div>
+    </div>
+  `);
+}
+
+/* ═══════════════════════════════════════
+   PANTALLA 2 — FILTRO DE CALIFICACIÓN (7 PREGUNTAS)
+
+   ── INSTRUCCIÓN: Edita el array FILTER_QS (definido arriba en el código)
+      para pegar tus 7 preguntas de calificación.
+      Cada opción tiene campo "v" (valor): 0 = peor perfil, 3 = mejor perfil.
+      scoreCalificacion = suma de las respuestas.  Max = 21.
+      Umbral actual: scoreCalificacion >= 12 de 21 posibles → CALIFICA. ──
+═══════════════════════════════════════ */
+function startQuestions() {
+  questionAns  = new Array(FILTER_QS.length).fill(null);
+  questionCur  = 0;
+  currentStage = 'questions';
+  updateStages(1);
+  document.getElementById('prog-bar').style.display = 'block';
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q    = FILTER_QS[questionCur];
+  const prog = Math.round(((questionCur + 1) / FILTER_QS.length) * 100);
+  document.getElementById('pf').style.width = prog + '%';
+
+  setView(`
+    <div class="section-tag">Test de calificación — Pregunta ${questionCur + 1} de ${FILTER_QS.length}</div>
+    <div style="font-size:17px;font-weight:500;color:var(--txt);margin-bottom:.75rem;line-height:1.45">${q.q}</div>
+    <div class="opts">
+      ${q.opts.map((o, i) => `
+        <button class="ob${questionAns[questionCur] === i ? ' sel' : ''}" onclick="pickQuestion(${i})">
+          <div class="oc"><div class="od"></div></div>
+          <div class="ot">${o.t}</div>
+        </button>
+      `).join('')}
+    </div>
+    <div class="nav">
+      ${questionCur > 0
+        ? '<button class="btn" onclick="goQuestion(-1)">← Anterior</button>'
+        : '<button class="btn" onclick="renderLanding()">← Volver</button>'}
+      <span class="nc">${questionCur + 1} / ${FILTER_QS.length}</span>
+      <button class="btn btn-primary" id="qnb" ${questionAns[questionCur] === null ? 'disabled' : ''} onclick="goQuestion(1)">
+        ${questionCur === FILTER_QS.length - 1 ? 'Continuar →' : 'Siguiente →'}
+      </button>
+    </div>
+  `);
+}
+
+function pickQuestion(i) {
+  questionAns[questionCur] = i;
+  document.querySelectorAll('.ob').forEach((b, j) => b.classList.toggle('sel', j === i));
+  const nb = document.getElementById('qnb');
+  if (nb) nb.disabled = false;
+}
+
+function goQuestion(d) {
+  questionCur += d;
+  if (questionCur >= FILTER_QS.length) { showContactForm(); return; }
+  renderQuestion();
+  window.scrollTo(0, 0);
+}
+
+/* scoreCalificacion: suma de los valores v[] de las respuestas del filtro */
+function calcScoreCalificacion() {
+  return questionAns.reduce((s, a, i) => a !== null ? s + FILTER_QS[i].opts[a].v : s, 0);
+}
+
+/* ═══════════════════════════════════════
+   PANTALLA 3 — CAPTURA DE DATOS (el peaje)
+   Aparece DESPUÉS de las 7 preguntas de calificación.
+═══════════════════════════════════════ */
+function showContactForm() {
+  document.getElementById('pf').style.width = '100%';
+  currentStage = 'contact';
+  updateStages(2);
+  document.getElementById('prog-bar').style.display = 'none';
+  setView(`
+    <div style="text-align:center;margin-bottom:1.5rem">
+      <div style="display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;background:var(--accent-bg);border-radius:10px;margin-bottom:.75rem">
+        <i class="ti ti-chart-dots" style="font-size:22px;color:var(--accent-lt)"></i>
+      </div>
+      <h2 style="margin-bottom:.4rem">¡Gracias por tus respuestas!</h2>
+      <p class="subtitle">Ingresa tus datos para verificar si tu empresa califica para nuestro Diagnóstico de Gestión.</p>
+    </div>
 
     <div class="form-grid">
       <div class="form-group full">
-        <label>Nombre completo <span class="req">*</span></label>
+        <label>Nombre <span class="req">*</span></label>
         <input type="text" id="f-nombre" placeholder="Ej: Carlos Mena" />
-        <span class="field-error" id="e-nombre">Ingresa tu nombre completo.</span>
+        <span class="field-error" id="e-nombre">Ingresa tu nombre.</span>
       </div>
       <div class="form-group">
-        <label>Correo electrónico <span class="req">*</span></label>
-        <input type="email" id="f-email" placeholder="correo@empresa.cl" />
-        <span class="field-error" id="e-email">Ingresa un email válido.</span>
+        <label>Cargo <span class="req">*</span></label>
+        <input type="text" id="f-cargo" placeholder="Ej: Gerente General" />
+        <span class="field-error" id="e-cargo">Ingresa tu cargo.</span>
+      </div>
+      <div class="form-group">
+        <label>Nombre de la Empresa <span class="req">*</span></label>
+        <input type="text" id="f-empresa" placeholder="Constructora XYZ" />
+        <span class="field-error" id="e-empresa">Ingresa el nombre de la empresa.</span>
       </div>
       <div class="form-group">
         <label>Teléfono <span class="req">*</span></label>
         <input type="tel" id="f-telefono" placeholder="+56 9 1234 5678" />
-        <span class="field-error" id="e-telefono">Ingresa tu número de teléfono.</span>
+        <span class="field-error" id="e-telefono">Ingresa tu teléfono.</span>
       </div>
       <div class="form-group">
-        <label>Empresa</label>
-        <input type="text" id="f-empresa" placeholder="Constructora XYZ" />
-      </div>
-      <div class="form-group">
-        <label>RUT empresa</label>
-        <input type="text" id="f-rut" placeholder="76.123.456-7" />
-      </div>
-      <div class="form-group">
-        <label>Cargo</label>
-        <input type="text" id="f-cargo" placeholder="Ej: Gerente General" />
+        <label>Correo <span class="req">*</span></label>
+        <input type="email" id="f-email" placeholder="correo@empresa.cl" />
+        <span class="field-error" id="e-email">Ingresa un email válido.</span>
       </div>
       <div class="form-group">
         <label>Región</label>
@@ -688,23 +792,28 @@ function renderContact() {
     <div class="nav">
       <span></span>
       <span></span>
-      <button class="btn btn-primary" onclick="submitContact()">Comenzar evaluación →</button>
+      <button class="btn btn-primary" style="padding:10px 24px" onclick="submitContactAndScore()">
+        Verificar mi calificación →
+      </button>
     </div>
   `);
 }
 
-function submitContact() {
+/* ═══════════════════════════════════════
+   PANTALLA 4 — LÓGICA DE SALTO (invisible para el usuario)
+   scoreCalificacion >= 12 → Pantalla 5B (CALIFICA)
+   scoreCalificacion <  12 → Pantalla 5A (NO CALIFICA)
+═══════════════════════════════════════ */
+function submitContactAndScore() {
   const nombre     = document.getElementById('f-nombre').value.trim();
-  const email      = document.getElementById('f-email').value.trim();
-  const telefono   = document.getElementById('f-telefono').value.trim();
-  const empresa    = document.getElementById('f-empresa').value.trim();
-  const rut        = document.getElementById('f-rut').value.trim();
   const cargo      = document.getElementById('f-cargo').value.trim();
+  const empresa    = document.getElementById('f-empresa').value.trim();
+  const telefono   = document.getElementById('f-telefono').value.trim();
+  const email      = document.getElementById('f-email').value.trim();
   const region     = document.getElementById('f-region').value;
   const especialidad = document.getElementById('f-especialidad').value;
 
   let ok = true;
-
   function validate(id, errId, cond) {
     const el  = document.getElementById(id);
     const err = document.getElementById(errId);
@@ -713,130 +822,107 @@ function submitContact() {
   }
 
   validate('f-nombre',   'e-nombre',   nombre.length >= 2);
-  validate('f-email',    'e-email',    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email));
+  validate('f-cargo',    'e-cargo',    cargo.length >= 2);
+  validate('f-empresa',  'e-empresa',  empresa.length >= 2);
   validate('f-telefono', 'e-telefono', telefono.length >= 8);
+  validate('f-email',    'e-email',    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email));
 
   if (!ok) return;
 
-  contactData = { nombre, email, telefono, empresa, rut, cargo, region, especialidad };
-  filterAns   = new Array(7).fill(null);
-  filterCur   = 0;
-  currentStage = 'filter';
-  updateStages(2);
-  document.getElementById('prog-bar').style.display = 'block';
-  renderFilter();
-}
+  contactData = { nombre, cargo, empresa, telefono, email, region, especialidad, rut: '' };
 
-/* ═══════════════════════════════════════
-   ETAPA 2 — FILTRO RÁPIDO
-═══════════════════════════════════════ */
-function renderFilter() {
-  const q    = FILTER_QS[filterCur];
-  const prog = Math.round(((filterCur + 1) / FILTER_QS.length) * 100);
-  document.getElementById('pf').style.width = prog + '%';
+  const scoreCalificacion = calcScoreCalificacion();        // max 21
+  const filterPct         = pct(scoreCalificacion, FILTER_QS.length * 3);
 
-  setView(`
-    <div class="section-tag">Paso 2 de 4 — Filtro de perfil</div>
-    <div style="font-size:17px;font-weight:500;color:var(--txt);margin-bottom:.3rem;line-height:1.45">${q.q}</div>
-    <div class="q-num">Pregunta ${filterCur + 1} de ${FILTER_QS.length}</div>
-    <div class="opts">
-      ${q.opts.map((o, i) => `
-        <button class="ob${filterAns[filterCur] === i ? ' sel' : ''}" onclick="pickFilter(${i})">
-          <div class="oc"><div class="od"></div></div>
-          <div class="ot">${o.t}</div>
-        </button>
-      `).join('')}
-    </div>
-    <div class="nav">
-      ${filterCur > 0 ? '<button class="btn" onclick="goFilter(-1)">← Anterior</button>' : '<span></span>'}
-      <span class="nc">${filterCur + 1} / ${FILTER_QS.length}</span>
-      <button class="btn btn-primary" id="fnb" ${filterAns[filterCur] === null ? 'disabled' : ''} onclick="goFilter(1)">
-        ${filterCur === FILTER_QS.length - 1 ? 'Ver resultado →' : 'Siguiente →'}
-      </button>
-    </div>
-  `);
-}
-
-function pickFilter(i) {
-  filterAns[filterCur] = i;
-  document.querySelectorAll('.ob').forEach((b, j) => b.classList.toggle('sel', j === i));
-  const nb = document.getElementById('fnb');
-  if (nb) nb.disabled = false;
-}
-
-function goFilter(d) {
-  filterCur += d;
-  if (filterCur >= FILTER_QS.length) { showFilterResult(); return; }
-  renderFilter();
   window.scrollTo(0, 0);
-}
 
-function filterScore() {
-  return filterAns.reduce((s, a, i) => a !== null ? s + FILTER_QS[i].opts[a].v : s, 0);
-}
-
-function showFilterResult() {
-  document.getElementById('pf').style.width = '100%';
-  currentStage = 'filter-result';
-  updateStages(2);
-
-  const score    = filterScore();
-  const MAX      = FILTER_QS.length * 3;
-  const totalPct = pct(score, MAX);
-
-  let tier, tierBadge, boxClass, msg, showDiag;
-
-  if (totalPct >= 60) {
-    tier = 'Perfil calificado'; tierBadge = 'badge-success'; boxClass = 'qualified';
-    msg  = 'Tu perfil encaja bien con el tipo de empresa con la que trabajamos. Te invitamos a completar el diagnóstico detallado para identificar tus áreas de mayor oportunidad.';
-    showDiag = true;
-  } else if (totalPct >= 35) {
-    tier = 'Perfil en evaluación'; tierBadge = 'badge-warning'; boxClass = 'borderline';
-    msg  = 'Hay elementos interesantes en tu perfil. Te invitamos igualmente a completar el diagnóstico para tener una visión más completa antes de conversar.';
-    showDiag = true;
-  } else {
-    tier = 'Por ahora no es el momento'; tierBadge = 'badge-danger'; boxClass = 'disqualified';
-    msg  = 'En base a tu perfil actual, no creemos que sea el momento ideal para una asesoría. Te invitamos a volver cuando las condiciones de tu empresa cambien.';
-    showDiag = false;
+  if (scoreCalificacion >= 12) {          /* ≥ 57% → CALIFICA → Pantalla 5B */
+    showResultB(filterPct);
+  } else {                                /* <  57% → NO CALIFICA → Pantalla 5A */
+    saveProspect(filterPct, 'No calificado', null, null, null);
+    showResultA(filterPct);
   }
-
-  const waMsg = encodeURIComponent(`Hola, completé la evaluación de perfil en tu plataforma con un ${totalPct}% (${tier}). Me gustaría tener más información.`);
-
-  setView(`
-    <div class="section-tag">Resultado del filtro de perfil</div>
-    <h2 style="margin-bottom:.25rem">Tu perfil de empresa</h2>
-    <p class="subtitle" style="margin-bottom:1.25rem">Basado en 7 preguntas de perfil y fit</p>
-
-    <div class="result-box ${boxClass}" style="margin-bottom:1.25rem">
-      <div class="result-score">${totalPct}<span style="font-size:20px;color:var(--txt2)">%</span></div>
-      <div class="result-label">sobre 100 puntos posibles</div>
-      <span class="badge ${tierBadge}">${tier}</span>
-      <p style="font-size:13px;color:var(--txt2);line-height:1.5;margin-top:.5rem">${msg}</p>
-    </div>
-
-    ${showDiag ? `
-      <button class="btn btn-primary" style="width:100%;justify-content:center;display:flex;padding:11px" onclick="startDiag()">
-        Continuar al diagnóstico completo →
-      </button>
-    ` : `
-      <a class="btn-wa" href="https://wa.me/${WA_NUMBER}?text=${waMsg}" target="_blank">
-        <i class="ti ti-brand-whatsapp"></i> Escribir de todos modos
-      </a>
-    `}
-  `);
-
-  if (!showDiag) saveProspect(totalPct, tier, null, null, null);
 }
 
 /* ═══════════════════════════════════════
-   ETAPA 3 — DIAGNÓSTICO 30 PREGUNTAS
+   PANTALLA 5A — NO CALIFICADO (fin del flujo)
+   Sin WhatsApp ni contacto directo — solo guía gratuita.
 ═══════════════════════════════════════ */
-function startDiag() {
-  diagAns  = new Array(7).fill(null);
-  diagCur  = 0;
-  currentStage = 'diag';
+function showResultA(filterPct) {
+  currentStage = 'result-a';
+  updateStages(4);
+  setView(`
+    <div class="section-tag">Resultado de calificación</div>
+    <h2 style="margin-bottom:.35rem">Gracias por postular</h2>
+    <p class="subtitle" style="margin-bottom:1.25rem">Hemos revisado tu perfil con atención.</p>
+
+    <div class="result-box disqualified" style="margin-bottom:1.5rem">
+      <div class="result-score">${filterPct}<span style="font-size:20px;color:var(--txt2)">%</span></div>
+      <div class="result-label">puntaje de calificación</div>
+      <span class="badge badge-danger" style="margin-top:.5rem">Perfil en estructuración inicial</span>
+    </div>
+
+    <div class="rc" style="margin-bottom:1.25rem">
+      <div style="font-size:14px;font-weight:500;color:var(--txt);margin-bottom:.5rem">
+        En este momento, nuestro Diagnóstico está diseñado para empresas con una estructura de operaciones diferente a la actual.
+      </div>
+      <p style="font-size:13px;color:var(--txt2);line-height:1.6">
+        No te preocupes: el camino hacia una empresa bien gestionada comienza con pequeños pasos. Te dejamos una guía gratuita para avanzar en la dirección correcta.
+      </p>
+    </div>
+
+    <!-- ── GUÍA GRATUITA: reemplaza la URL en href con el enlace real de tu descarga ── -->
+    <a class="btn btn-primary" href="https://berticebybaeval.github.io/evaluacion/Guia-7-Dolores-Pymes-Constructoras-BERTICE.pdf" target="_blank"
+       style="display:inline-flex;align-items:center;gap:8px;text-decoration:none;padding:10px 20px">
+      <i class="ti ti-download"></i> Descargar guía gratuita de gestión de obras
+    </a>
+
+    <div style="margin-top:1.25rem;text-align:center">
+      <button class="btn" onclick="restart()" style="font-size:12px;color:var(--txt3)">← Volver al inicio</button>
+    </div>
+  `);
+}
+
+/* ═══════════════════════════════════════
+   PANTALLA 5B — CALIFICADO + DIAGNÓSTICO (7 PREGUNTAS)
+
+   ── INSTRUCCIÓN: Edita el array DIAG_QS (definido arriba en el código)
+      para pegar tus 7 preguntas de diagnóstico de gestión.
+      scoreDiagnostico = suma de los valores v[] de las respuestas.
+      El resultado en Pantalla 6 es DINÁMICO según el puntaje obtenido. ──
+═══════════════════════════════════════ */
+function showResultB(filterPct) {
+  currentStage = 'diag-intro';
   updateStages(3);
-  renderDiag();
+  diagAns = new Array(DIAG_QS.length).fill(null);
+  diagCur = 0;
+  document.getElementById('prog-bar').style.display = 'block';
+  document.getElementById('pf').style.width = '0%';
+
+  setView(`
+    <div class="result-box qualified" style="margin-bottom:1.5rem;text-align:center">
+      <div style="font-size:32px;margin-bottom:.35rem;color:var(--green)">✓</div>
+      <div style="font-size:16px;font-weight:500;color:var(--txt);margin-bottom:.5rem">
+        ¡Felicidades! La estructura de tu empresa califica para nuestro Diagnóstico de Gestión.
+      </div>
+      <span class="badge badge-success">Perfil calificado — ${filterPct}%</span>
+    </div>
+
+    <div class="rc" style="margin-bottom:1.25rem">
+      <div style="font-size:14px;font-weight:500;color:var(--txt);margin-bottom:.4rem">Siguiente paso: Diagnóstico de gestión</div>
+      <p style="font-size:13px;color:var(--txt2);line-height:1.55">
+        A continuación, responde estas ${DIAG_QS.length} preguntas finales para evaluar tu estado actual de gestión y entregarte un resultado a medida.
+      </p>
+    </div>
+
+    <div class="nav">
+      <span></span>
+      <span></span>
+      <button class="btn btn-primary" style="padding:10px 24px" onclick="renderDiag()">
+        Iniciar diagnóstico →
+      </button>
+    </div>
+  `);
 }
 
 function renderDiag() {
@@ -847,10 +933,9 @@ function renderDiag() {
   setView(`
     <div class="section-tag">
       <i class="ti ti-${AREA_ICONS[q.a]}" style="font-size:12px;margin-right:4px"></i>
-      Área ${q.a + 1}: ${AREAS[q.a]}
+      Diagnóstico — Pregunta ${diagCur + 1} de ${DIAG_QS.length}
     </div>
-    <div style="font-size:16px;font-weight:500;color:var(--txt);margin-bottom:.3rem;line-height:1.45">${q.q}</div>
-    <div class="q-num">Paso 3 de 4 — Pregunta ${diagCur + 1} de ${DIAG_QS.length}</div>
+    <div style="font-size:16px;font-weight:500;color:var(--txt);margin-bottom:.75rem;line-height:1.45">${q.q}</div>
     <div class="opts">
       ${q.opts.map((o, i) => `
         <button class="ob${diagAns[diagCur] === i ? ' sel' : ''}" onclick="pickDiag(${i})">
@@ -860,10 +945,12 @@ function renderDiag() {
       `).join('')}
     </div>
     <div class="nav">
-      ${diagCur > 0 ? '<button class="btn" onclick="goDiag(-1)">← Anterior</button>' : '<span></span>'}
+      ${diagCur > 0
+        ? '<button class="btn" onclick="goDiag(-1)">← Anterior</button>'
+        : '<span></span>'}
       <span class="nc">${diagCur + 1} / ${DIAG_QS.length}</span>
       <button class="btn btn-primary" id="dnb" ${diagAns[diagCur] === null ? 'disabled' : ''} onclick="goDiag(1)">
-        ${diagCur === DIAG_QS.length - 1 ? 'Ver diagnóstico →' : 'Siguiente →'}
+        ${diagCur === DIAG_QS.length - 1 ? 'Generar mi Evaluación →' : 'Siguiente →'}
       </button>
     </div>
   `);
@@ -878,82 +965,100 @@ function pickDiag(i) {
 
 function goDiag(d) {
   diagCur += d;
-  if (diagCur >= DIAG_QS.length) { showDiagResult(); return; }
+  if (diagCur >= DIAG_QS.length) { showFinalResult(); return; }
   renderDiag();
   window.scrollTo(0, 0);
 }
 
-/* ═══════════════════════════════════════
-   ETAPA 4 — RESULTADO DIAGNÓSTICO
-═══════════════════════════════════════ */
 function areaScore(a) {
   let s = 0, n = 0;
-  DIAG_QS.forEach((q, i) => { if (q.a === a && diagAns[i] !== null) { s += DIAG_QS[i].opts[diagAns[i]].v; n++; } });
+  DIAG_QS.forEach((q, i) => {
+    if (q.a === a && diagAns[i] !== null) { s += DIAG_QS[i].opts[diagAns[i]].v; n++; }
+  });
   return { score: s, max: n * 3 };
 }
 
-function diagTotalScore() {
+/* scoreDiagnostico: suma de los valores v[] de las 7 preguntas de diagnóstico */
+function calcScoreDiagnostico() {
   return DIAG_QS.reduce((s, q, i) => diagAns[i] !== null ? s + DIAG_QS[i].opts[diagAns[i]].v : s, 0);
 }
 
-function showDiagResult() {
+/* ═══════════════════════════════════════
+   PANTALLA 6 — EVALUACIÓN FINAL + CTA WHATSAPP
+   Mensaje dinámico según scoreDiagnostico.
+   ── INSTRUCCIÓN: El número de WhatsApp se configura en WA_NUMBER
+      al inicio del script. El href apunta a https://wa.me/WA_NUMBER ──
+═══════════════════════════════════════ */
+function showFinalResult() {
   document.getElementById('pf').style.width = '100%';
-  currentStage = 'diag-result';
+  currentStage = 'result-final';
   updateStages(4);
 
-  const total     = diagTotalScore();
-  const MAX_TOTAL = DIAG_QS.length * 3;
-  const totalPct  = pct(total, MAX_TOTAL);
-  const aScores   = AREAS.map((_, a) => areaScore(a));
-  const weakAreas = [...aScores.map((s, a) => ({ a, p: pct(s.score, s.max) }))]
-    .sort((a, b) => a.p - b.p).slice(0, 3).map(x => AREAS[x.a]);
+  const scoreDiagnostico = calcScoreDiagnostico();
+  const MAX_DIAG         = DIAG_QS.length * 3;
+  const diagPct          = pct(scoreDiagnostico, MAX_DIAG);
+  const filterPct        = pct(calcScoreCalificacion(), FILTER_QS.length * 3);
+  const aScores          = AREAS.map((_, a) => areaScore(a));
 
-  let tier, tierBadge, ctaCls, ctaH, ctaB;
-  if (totalPct >= 65) {
-    tier = 'Empresa bien gestionada'; tierBadge = 'badge-success'; ctaCls = 'cta-s';
-    ctaH = 'Oportunidades de optimización avanzada';
-    ctaB = 'Llevas tu empresa con solidez. En construcción la diferencia entre una empresa buena y una muy rentable está en los detalles. Conversemos sobre cómo llevar tu gestión al siguiente nivel.';
-  } else if (totalPct >= 40) {
-    tier = 'Brechas críticas identificadas'; tierBadge = 'badge-warning'; ctaCls = 'cta-w';
-    ctaH = 'Este es el momento de actuar';
-    ctaB = 'Tu diagnóstico revela brechas importantes en áreas que impactan directamente tu rentabilidad y flujo de caja. Una sesión 1 a 1 puede ayudarte a priorizar dónde atacar primero.';
+  /* Mensaje dinámico según scoreDiagnostico */
+  let diagTier, tierBadge, ctaCls, mensajeDinamico, ctaSubtitulo;
+
+  if (diagPct >= 65) {
+    diagTier        = 'Gestión consolidada';
+    tierBadge       = 'badge-success';
+    ctaCls          = 'cta-s';
+    mensajeDinamico = 'Tu empresa ya tiene una base sólida de gestión. La diferencia entre una buena constructora y una muy rentable está en los detalles: márgenes por obra, flujo de caja proyectado y productividad en terreno.';
+    ctaSubtitulo    = 'En esta asesoría identificamos las palancas que más rentabilidad pueden darte en los próximos 6 meses.';
+  } else if (diagPct >= 40) {
+    diagTier        = 'Brechas críticas detectadas';
+    tierBadge       = 'badge-warning';
+    ctaCls          = 'cta-w';
+    mensajeDinamico = 'Hemos detectado áreas críticas de mejora en tus operaciones y flujo de caja. Tu empresa tiene potencial real, pero hay fugas de rentabilidad que podemos identificar y cerrar rápidamente.';
+    ctaSubtitulo    = 'Agenda tu asesoría y te mostramos exactamente qué priorizar para ver resultados en 90 días.';
   } else {
-    tier = 'Situación de alto riesgo operacional'; tierBadge = 'badge-danger'; ctaCls = 'cta-d';
-    ctaH = 'Requieres intervención urgente';
-    ctaB = 'Tu empresa enfrenta vulnerabilidades severas en múltiples frentes. El costo de no actuar hoy puede ser mucho más alto que el de una asesoría. Conversemos esta semana.';
+    diagTier        = 'Alto riesgo operacional';
+    tierBadge       = 'badge-danger';
+    ctaCls          = 'cta-d';
+    mensajeDinamico = 'Hemos detectado vulnerabilidades severas en múltiples frentes de tu operación. El costo de no actuar hoy es mucho más alto que el de una asesoría: pérdida de margen, conflictos laborales y riesgo de liquidez.';
+    ctaSubtitulo    = 'Esta asesoría puede ser el punto de inflexión para tu empresa. Te esperamos esta semana.';
   }
 
-  const filterPct = pct(filterScore(), FILTER_QS.length * 3);
+  const weakAreas = [...aScores.map((s, a) => ({ a, p: pct(s.score, s.max) }))]
+    .filter(x => aScores[x.a].max > 0)
+    .sort((x, y) => x.p - y.p)
+    .slice(0, 3)
+    .map(x => AREAS[x.a]);
 
-  saveProspect(filterPct, null, totalPct, tier, aScores);
+  saveProspect(filterPct, 'Calificado', diagPct, diagTier, aScores);
 
+  /* Botón principal de conversión: https://wa.me/WA_NUMBER?text=... */
   const waMsg = encodeURIComponent(
-    `Hola, acabo de completar el diagnóstico de gestión para pymes constructoras.\n\nMis resultados:\n• Filtro de perfil: ${filterPct}%\n• Diagnóstico de gestión: ${totalPct}% (${tier})\n• Áreas con más brechas: ${weakAreas.join(', ')}\n\nMe gustaría agendar una sesión contigo.`
+    `Hola, completé el Diagnóstico de Gestión para Constructoras.\n\n• Calificación: ${filterPct}%\n• Diagnóstico: ${diagPct}% — ${diagTier}\n• Áreas con brecha: ${weakAreas.join(', ')}\n\nMe gustaría agendar una asesoría de 45 minutos para revisar este resultado.`
   );
   const waUrl = `https://wa.me/${WA_NUMBER}?text=${waMsg}`;
 
   setView(`
-    <div class="section-tag">Paso 4 de 4 — Tu diagnóstico</div>
-    <h2 style="margin-bottom:.25rem">Resultado de gestión</h2>
-    <p class="subtitle" style="margin-bottom:1.25rem">Basado en 30 preguntas en 6 áreas clave</p>
+    <div class="section-tag">Evaluación Final — Tu diagnóstico de gestión</div>
+    <h2 style="margin-bottom:.25rem">Resultados de tu diagnóstico</h2>
+    <p class="subtitle" style="margin-bottom:1.25rem">Basado en ${DIAG_QS.length} preguntas clave de tu operación</p>
 
-    <div class="rc">
+    <div class="rc" style="margin-bottom:.75rem">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
         <div>
-          <div style="font-size:13px;color:var(--txt2);margin-bottom:2px">Puntaje global</div>
+          <div style="font-size:12px;color:var(--txt2);margin-bottom:2px">Puntaje de gestión</div>
           <div style="display:flex;align-items:baseline;gap:6px">
-            <span style="font-size:38px;font-weight:500;color:var(--txt);line-height:1">${totalPct}</span>
+            <span style="font-size:42px;font-weight:500;color:var(--txt);line-height:1">${diagPct}</span>
             <span style="font-size:18px;color:var(--txt2);font-weight:500">/ 100</span>
           </div>
         </div>
-        <span class="badge ${tierBadge}">${tier}</span>
+        <span class="badge ${tierBadge}">${diagTier}</span>
       </div>
       ${aScores.map((s, a) => {
         const p = pct(s.score, s.max);
         return `<div class="area-bar-wrap">
           <div class="area-bar-label">
             <span class="area-bar-name">
-              <i class="ti ti-${AREA_ICONS[a]}" style="font-size:13px;margin-right:5px;color:var(--txt2)"></i>${AREAS[a]}
+              <i class="ti ti-${AREA_ICONS[a]}" style="font-size:12px;margin-right:4px;color:var(--txt2)"></i>${AREAS[a]}
             </span>
             <span class="area-bar-pct">${p}%</span>
           </div>
@@ -964,23 +1069,30 @@ function showDiagResult() {
       }).join('')}
     </div>
 
-    <div class="rc">
-      <div style="font-size:13px;font-weight:500;color:var(--txt);margin-bottom:.5rem">Áreas con mayor brecha</div>
-      <ul class="weak-list">
-        ${weakAreas.map(w => `<li><i class="ti ti-alert-triangle" style="color:#BA7517;font-size:14px"></i>${w}</li>`).join('')}
-      </ul>
-    </div>
-
     <div class="cta-block ${ctaCls}">
-      <div class="cta-h">${ctaH}</div>
-      <div class="cta-b">${ctaB}</div>
+      <div class="cta-h">Agenda una asesoría de 45 minutos para revisar este diagnóstico a profundidad</div>
+      <div class="cta-b">
+        ${mensajeDinamico}<br><br>
+        <em style="color:var(--txt2)">${ctaSubtitulo}</em>
+      </div>
+      <!-- ── BOTÓN PRINCIPAL DE CONVERSIÓN ── -->
       <a class="btn-wa" href="${waUrl}" target="_blank">
-        <i class="ti ti-brand-whatsapp"></i> Agendar sesión 1 a 1 por WhatsApp
+        <i class="ti ti-brand-whatsapp"></i> Agendar mi Asesoría por WhatsApp
       </a>
     </div>
 
-    <div style="margin-top:1rem;text-align:center">
-      <button class="btn" onclick="restart()" style="font-size:12px;color:var(--txt2)">Volver al inicio</button>
+    ${weakAreas.length > 0 ? `
+    <div class="rc" style="margin-top:.75rem">
+      <div style="font-size:13px;font-weight:500;color:var(--txt);margin-bottom:.5rem">
+        Áreas con mayor brecha detectada
+      </div>
+      <ul class="weak-list">
+        ${weakAreas.map(w => `<li><i class="ti ti-alert-triangle" style="color:var(--amber);font-size:13px"></i>${w}</li>`).join('')}
+      </ul>
+    </div>` : ''}
+
+    <div style="margin-top:1.25rem;text-align:center">
+      <button class="btn" onclick="restart()" style="font-size:12px;color:var(--txt3)">← Volver al inicio</button>
     </div>
   `);
 }
@@ -1034,16 +1146,13 @@ function saveProspect(filterPct, filterTier, diagPct, diagTier, aScores) {
 }
 
 function restart() {
-  contactData = {};
-  filterAns   = new Array(7).fill(null);
-  diagAns     = new Array(7).fill(null);
-  filterCur   = 0;
-  diagCur     = 0;
-  currentStage = 'contact';
-  updateStages(1);
-  document.getElementById('prog-bar').style.display = 'none';
-  renderContact();
+  contactData  = {};
+  questionAns  = [];
+  questionCur  = 0;
+  diagAns      = [];
+  diagCur      = 0;
   window.scrollTo(0, 0);
+  renderLanding();
 }
 
 /* ═══════════════════════════════════════
@@ -1192,9 +1301,9 @@ function renderAdminLogin(errorMsg) {
   document.getElementById('admin').style.display = 'block';
   document.getElementById('admin').innerHTML = `
     <div style="max-width:360px;margin:4rem auto">
-      <div style="background:#fff;border:.5px solid #e0ddd6;border-radius:16px;padding:2rem">
+      <div style="background:var(--surface);border:.5px solid var(--border);border-radius:16px;padding:2rem">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:1.5rem">
-          <div style="width:36px;height:36px;background:#1a1a18;border-radius:8px;display:flex;align-items:center;justify-content:center;color:white;font-size:18px">
+          <div style="width:36px;height:36px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;color:white;font-size:18px">
             <i class="ti ti-lock"></i>
           </div>
           <div>
@@ -1205,12 +1314,12 @@ function renderAdminLogin(errorMsg) {
         <div style="margin-bottom:1rem">
           <label style="font-size:12px;font-weight:500;color:var(--txt2);display:block;margin-bottom:5px">Contraseña</label>
           <input type="password" id="admin-pwd" placeholder="Ingresa tu contraseña"
-            style="width:100%;height:38px;padding:0 12px;border:.5px solid ${errorMsg ? '#A32D2D' : '#e0ddd6'};border-radius:8px;font-size:14px;font-family:inherit;outline:none"
+            style="width:100%;height:38px;padding:0 12px;background:var(--surface2);color:var(--txt);border:.5px solid ${errorMsg ? 'var(--red)' : 'var(--border)'};border-radius:8px;font-size:14px;font-family:inherit;outline:none"
             onkeydown="if(event.key==='Enter')checkAdminPwd()" autofocus />
           ${errorMsg ? `<div style="font-size:11px;color:var(--red);margin-top:4px">${errorMsg}</div>` : ''}
         </div>
         <button onclick="checkAdminPwd()"
-          style="width:100%;padding:9px;background:#1a1a18;color:white;border:none;border-radius:8px;font-size:14px;font-family:inherit;cursor:pointer">
+          style="width:100%;padding:9px;background:var(--accent);color:white;border:none;border-radius:8px;font-size:14px;font-family:inherit;cursor:pointer">
           Ingresar
         </button>
       </div>
